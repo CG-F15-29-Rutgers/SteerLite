@@ -107,7 +107,7 @@
     <initialConditions>
       <radius>0.5</radius>
       <position> <x>0</x> <y>0</y> <z>0</z> </position>
-      <direction> <x>1</x> <y>0.5</y> <z>0</z> </direction>
+      <direction> <x>1</x> <y>0</y> <z>0</z> </direction>
       <speed>0</speed>
     </initialConditions>
     <goalSequence>
