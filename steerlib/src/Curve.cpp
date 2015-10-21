@@ -72,20 +72,16 @@ void Curve::drawCurve(Color curveColor, float curveThickness, int window) //ever
 // Sort controlPoints vector in ascending order: min-first
 void Curve::sortControlPoints()
 {
-	//=========================================================================
-    // 2015. 9.27 Diana Kim //bubble sort.
-
-    int size_inputPoints = controlPoints.size(); // vector size.
-    float temp_swap;
-    for (int i = 0 ; i <size_inputPoints;++i)
+    // bubble sort
+    for (int i = 0; i < controlPoints.size(); ++i)
     {
-        for (int j=0 ; j<size_inputPoints-(i+1);++j )
+        for (int j = 0; j < controlPoints.size() - (i+1); ++j)
         {
-            if(controlPoints[j].time>controlPoints[j+1].time)
+            if (controlPoints[j].time > controlPoints[j+1].time)
             {
-                temp_swap = controlPoints[j].time;
-                controlPoints[j].time=controlPoints[j+1].time;
-                controlPoints[j+1].time=temp_swap;
+                float temp_swap = controlPoints[j].time;
+                controlPoints[j].time = controlPoints[j+1].time;
+                controlPoints[j+1].time = temp_swap;
             }
         }
     }
