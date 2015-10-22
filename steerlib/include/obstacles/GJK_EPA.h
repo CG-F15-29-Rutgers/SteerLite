@@ -56,6 +56,7 @@ namespace SteerLib
             static bool intersect(float& return_penetration_depth, Util::Vector& return_penetration_vector, const std::vector<Util::Vector>& _shapeA, const std::vector<Util::Vector>& _shapeB);
 
         private:
+            static void support(Util::Vector& point, const std::vector<Util::Vector>& shape, const Util::Vector& direction);
             static bool GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& A, const std::vector<Util::Vector>& B);
             static void EPA(float& penetration_depth, Util::Vector& penetration_vector, const std::vector<Util::Vector>& A, const std::vector<Util::Vector>& B, const std::vector<Util::Vector>& simplex);
     }; // class GJK_EPA

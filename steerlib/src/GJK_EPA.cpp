@@ -12,6 +12,19 @@ SteerLib::GJK_EPA::GJK_EPA()
 {
 }
 
+void SteerLib::GJK_EPA::support(Util::Vector& point, const std::vector<Util::Vector>& shape, const Util::Vector& direction)
+{
+    double max = 0.0;
+
+    for (std::vector<Util::Vector>::const_iterator iter = shape.begin(); iter != shape.end(); ++iter) {
+        double thisDot = dot(*iter, direction);
+        if (thisDot > max) {
+            max = thisDot;
+            point = *iter;
+        }
+    }
+}
+
 bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB)
 {
     // if (A collides with B) {
