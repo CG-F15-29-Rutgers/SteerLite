@@ -27,17 +27,55 @@ Util::Vector SteerLib::GJK_EPA::support(const std::vector<Util::Vector>& shape, 
     return point;
 }
 
+bool SteerLib::GJK_EPA::simplexContainsOrigin(std::vector<Util::Vector>& simplex, Util::Vector& direction)
+{
+    assert(simplex.size() == 3);
+
+    Util::Vector A = simplex[0];
+    Util::Vector B = simplex[1];
+    Util::Vector C = simplex[2];
+
+    Util::Vector CB = B - C;
+    Util::Vector CA = A - C;
+    Util::Vector CO = -C;     // C to the origin
+
+    if (dot(cross(cross(CB, CA), CA), CO) > 0) {
+        // origin is beyond CA
+        simplex.erase(simplex.begin() + 1); // delete B
+        direction = cross(cross(CB, CA), CA);
+        return false;
+    } else if (dot(cross(cross(CA, CB), CB), CO) > 0) {
+        // origin is beyond CB
+        simplex.erase(simplex.begin()); // delete A
+        direction = cross(cross(CA, CB), CB);
+        return false;
+    } else {
+        // simplex contains origin
+        return true;
+    }
+}
+
 bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB)
 {
-    // if (A collides with B) {
-    //     simplex = ...;
-    //     ...
-    //     return true;
-    // } else {
-    //     simplex = NULL
-    //     return false;
-    // }
-    return false;
+    Util::Vector D0(1, 0, 0);
+    Util::Vector D1(0, 0, 1);
+    Util::Vector A = support(shapeA, D0) - support(shapeB, -D0);
+    Util::Vector B = support(shapeA, D1) - support(shapeB, -D1);
+    Util::Vector AB = B - A;
+    Util::Vector AO = -A;
+    simplex.clear();
+    simplex.push_back(A);
+    simplex.push_back(B);
+    Util::Vector D = cross(cross(AB, AO), AB);
+    while (true) {
+        Util::Vector C = support(shapeA, D) - support(shapeB, -D);
+        if (dot(C, D) < 0)
+            return false;
+        simplex.push_back(C);
+        bool contains_origin = simplexContainsOrigin(simplex, D);
+        if (contains_origin)
+            return true;
+    }
 }
 
 void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector, const std::vector<Util::Vector>& A, const std::vector<Util::Vector>& B, const std::vector<Util::Vector>& simplex)
