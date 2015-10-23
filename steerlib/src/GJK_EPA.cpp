@@ -78,11 +78,74 @@ bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vecto
     }
 }
 
-void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector, const std::vector<Util::Vector>& A, const std::vector<Util::Vector>& B, const std::vector<Util::Vector>& simplex)
+
+void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector,  const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,  std::vector<Util::Vector>& simplex)
 {
     // Calculate penetration
     // penetration_depth = ...
     // penetration_vector = ...
+    Util::Vector E0(0,0,0);
+    
+    while(true)
+    {
+        
+        SteerLib::GJK_EPA::Find_Closest_edge(simplex,E0); //return E0 : normal vector.
+        Util::Vector new_Vertex = support(A,E0)-support(B,-E0); //new point.
+        //dot(O new_vertex,projection E0) ==magnitude of EO?)
+        
+        
+        
+        if (abs(E0.norm()-dot(new_Vertex,E0/E0.norm()))<0.00001) // until find minkowski
+        {
+            //std::cerr<<abs(E0.norm()-dot(new_Vertex,E0/E0.norm()));
+            //" Collision detected between polygon No."<<i<<" and No."<<j<< " with a penetration depth of "<< penetration_depth << " and penetration vector of "<<penetration_vector<<std::endl;
+            penetration_depth = E0.norm();
+            penetration_vector = E0/E0.norm();
+            break;
+        }
+        
+        else
+            //add simplex.
+            simplex.push_back(new_Vertex); // and loop.
+        
+    }
+    
+}
+
+void SteerLib::GJK_EPA::Find_Closest_edge(std::vector<Util::Vector>& simplex, Util::Vector& direction)
+{
+    Util::Vector A = simplex[0];
+    Util::Vector B = simplex[1];
+    Util::Vector C = simplex[2];
+    
+    std::vector<Util::Vector> edge;
+    edge.push_back(B-A); //AB
+    edge.push_back(C-B); //BC
+    edge.push_back(A-C); //CA
+    
+    std::vector<float> min_value;
+    std::vector<Util::Vector> normal_to_edge;
+    
+   // std::vector<Util::Vector> normal_to edge;
+    min_value.push_back(10);
+    for (int i=0;i<sizeof(normal_to_edge);++i)
+    {
+        normal_to_edge.push_back(cross(cross(edge[i],-simplex[i]),edge[i])); //direction.
+        min_value.push_back(dot(simplex[i],normal_to_edge[i]/normal_to_edge[i].norm())); //value
+        
+    }
+    
+    //find min value;
+    
+    int min_index=0;
+    
+    for (int i=0;i<sizeof(min_value);++i)
+    {
+        if(min_value[min_index]>min_value[i])
+            min_index=i;
+        
+    }
+    direction = normal_to_edge[min_index];
 }
 
 /**

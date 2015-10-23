@@ -1,0 +1,72 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		F2D09B8D1BD9C3D900500ED2 /* SteerLite */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SteerLite; path = ..; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		F2D09B861BD9C3B800500ED2 = {
+			isa = PBXGroup;
+			children = (
+				F2D09B8D1BD9C3D900500ED2 /* SteerLite */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		F2D09B871BD9C3B800500ED2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+			};
+			buildConfigurationList = F2D09B8A1BD9C3B800500ED2 /* Build configuration list for PBXProject "steerLite Collision" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F2D09B861BD9C3B800500ED2;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		F2D09B8B1BD9C3B800500ED2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		F2D09B8C1BD9C3B800500ED2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F2D09B8A1BD9C3B800500ED2 /* Build configuration list for PBXProject "steerLite Collision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2D09B8B1BD9C3B800500ED2 /* Debug */,
+				F2D09B8C1BD9C3B800500ED2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F2D09B871BD9C3B800500ED2 /* Project object */;
+}
