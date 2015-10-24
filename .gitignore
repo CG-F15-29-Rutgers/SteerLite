@@ -37,3 +37,9 @@
 # SDF files
 **/*.opensdf
 **/*.sdf
+
+**/deps/
+build/bin
+steerbench/build/steerbench
+steersim/build/steersim
+steertool/build/steertool
