@@ -91,7 +91,7 @@ bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vecto
 
 void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector,  const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,  std::vector<Util::Vector>& simplex)
 {
-    while(true)
+    while (true)
     {
         Util::Vector E0 = findClosestEdge(simplex); // return E0 : normal vector.
         Util::Vector new_Vertex = support(A, E0) - support(B, -E0); // new point.
@@ -127,7 +127,7 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
     std::vector<float> min_value;
     std::vector<Util::Vector> normal_to_edge;
 
-    min_value.push_back(10);
+    // min_value.push_back(10);
     for (size_t i = 0; i < edge.size(); ++i)
     {
         normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction.
@@ -136,7 +136,7 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
 
     // find min value;
     int min_index = 0;
-    for (int i = 0; i < sizeof(min_value); ++i)
+    for (size_t i = 1; i < min_value.size(); ++i)
         if (min_value[min_index] > min_value[i])
             min_index = i;
 
