@@ -124,20 +124,20 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
     edge.push_back(C - B); // BC
     edge.push_back(A - C); // CA
 
-    std::vector<float> min_value;
+    std::vector<float> distances;
     std::vector<Util::Vector> normal_to_edge;
 
-    // min_value.push_back(10);
+    // distances.push_back(10);
     for (size_t i = 0; i < edge.size(); ++i)
     {
         normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction.
-        min_value.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // value
+        distances.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // value
     }
 
     // find min value;
     int min_index = 0;
-    for (size_t i = 1; i < min_value.size(); ++i)
-        if (min_value[min_index] > min_value[i])
+    for (size_t i = 1; i < distances.size(); ++i)
+        if (distances[min_index] > distances[i])
             min_index = i;
 
     return normal_to_edge[min_index];
