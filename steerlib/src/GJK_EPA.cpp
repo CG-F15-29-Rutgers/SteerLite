@@ -93,7 +93,8 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
 {
     while (true)
     {
-        Util::Vector E0 = findClosestEdge(simplex); // return E0 : normal vector.
+        int edge_index;
+        Util::Vector E0 = findClosestEdge(simplex, edge_index); // return E0 : normal vector.
         Util::Vector new_Vertex = support(A, E0) - support(B, -E0); // new point.
         // dot(O new_vertex, projection E0) ==magnitude of EO?)
 
@@ -105,13 +106,13 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
             penetration_vector = unit(E0);
             break;
         } else {
-            // add simplex.
-            simplex.push_back(new_Vertex); // and loop.
+            // add new point to simplex and loop
+            simplex.insert(simplex.begin() + edge_index, new_Vertex);
         }
     }
 }
 
-Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& simplex)
+Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& simplex, int& index)
 {
     assert(simplex.size() > 2);
 
@@ -134,13 +135,13 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
         distances.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // value
     }
 
-    // find min value;
-    int min_index = 0;
+    // find min distance
+    index = 0;
     for (size_t i = 1; i < distances.size(); ++i)
-        if (distances[min_index] > distances[i])
-            min_index = i;
+        if (distances[index] > distances[i])
+            index = i;
 
-    return normal_to_edge[min_index];
+    return normal_to_edge[index];
 }
 
 /**
