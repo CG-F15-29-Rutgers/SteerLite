@@ -52,6 +52,11 @@ bool SteerLib::GJK_EPA::simplexContainsOrigin(std::vector<Util::Vector>& simplex
     }
 }
 
+Util::Vector SteerLib::GJK_EPA::unit(const Util::Vector& v)
+{
+    return v / v.norm();
+}
+
 bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB)
 {
     // initial directions
@@ -96,11 +101,11 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
         // dot(O new_vertex, projection E0) ==magnitude of EO?)
 
         // until find minkowski
-        if (abs(E0.norm() - dot(new_Vertex, E0/E0.norm())) < 0.00001) {
-            // std::cerr << abs(E0.norm()-dot(new_Vertex,E0/E0.norm()));
+        if (abs(E0.norm() - dot(new_Vertex, unit(E0))) < 1e-6) {
+            // std::cerr << abs(E0.norm()-dot(new_Vertex,unit(E0)));
             // " Collision detected between polygon No." << i << " and No." << j <<  " with a penetration depth of " << penetration_depth << " and penetration vector of " << penetration_vector << std::endl;
             penetration_depth = E0.norm();
-            penetration_vector = E0/E0.norm();
+            penetration_vector = unit(E0);
             break;
         } else {
             // add simplex.
@@ -125,10 +130,10 @@ void SteerLib::GJK_EPA::findClosestEdge(std::vector<Util::Vector>& simplex, Util
 
     // std::vector<Util::Vector> normal_to edge;
     min_value.push_back(10);
-    for (int i=0; i < sizeof(normal_to_edge); ++i)
+    for (int i = 0; i < sizeof(normal_to_edge); ++i)
     {
         normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction.
-        min_value.push_back(dot(simplex[i], normal_to_edge[i]/normal_to_edge[i].norm())); // value
+        min_value.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // value
     }
 
     // find min value;

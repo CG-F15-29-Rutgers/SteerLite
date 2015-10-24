@@ -19,6 +19,7 @@ namespace SteerLib
             static bool GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& A, const std::vector<Util::Vector>& B);
             static void EPA(float& penetration_depth, Util::Vector& penetration_vector,  const std::vector<Util::Vector>& A, const std::vector<Util::Vector>& B,  std::vector<Util::Vector>& simplex);
             static void findClosestEdge(std::vector<Util::Vector>& simplex, Util::Vector& direction);
+            static Util::Vector unit(const Util::Vector& v);
     };
 }
 
