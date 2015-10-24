@@ -131,8 +131,8 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
     // distances.push_back(10);
     for (size_t i = 0; i < edge.size(); ++i)
     {
-        normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction.
-        distances.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // value
+        normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction
+        distances.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // distance
     }
 
     // find min distance
