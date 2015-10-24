@@ -9,7 +9,7 @@ Util::Vector SteerLib::GJK_EPA::support(const std::vector<Util::Vector>& shape, 
     assert(shape.size() > 0);
 
     double max = dot(*shape.begin(), direction);
-    Util::Vector point;
+    Util::Vector point = *shape.begin();
 
     for (std::vector<Util::Vector>::const_iterator iter = shape.begin(); iter != shape.end(); ++iter) {
         double thisDot = dot(*iter, direction);
