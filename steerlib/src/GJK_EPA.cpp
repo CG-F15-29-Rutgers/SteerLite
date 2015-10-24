@@ -62,16 +62,12 @@ bool SteerLib::GJK_EPA::simplexContainsOrigin(std::vector<Util::Vector>& simplex
     if (dot(normalToCA, CO) > 0) {
         // origin is beyond CA
         simplex.erase(simplex.begin() + 1); // delete B
-<<<<<<< HEAD
-        direction = cross(cross(CB, CA), CA); //new direction.
-=======
-        direction = normalToCA;
->>>>>>> 2267cf7e388aaecaf5d0dbf699edc646216a1b41
+        direction = normalToCA; //new direction.
         return false;
     } else if (dot(normalToCB, CO) > 0) {
         // origin is beyond CB
         simplex.erase(simplex.begin()); // delete A
-        direction = normalToCB;
+        direction = normalToCB; //new direction.
         return false;
     } else {
         // simplex contains origin
