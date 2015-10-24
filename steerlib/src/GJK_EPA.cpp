@@ -101,7 +101,7 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
         // dot(O new_vertex, projection E0) ==magnitude of EO?)
 
         // until find minkowski
-        if (abs(E0.norm() - dot(new_Vertex, unit(E0))) < 1e-6) {
+        if (fabs(E0.norm() - dot(new_Vertex, unit(E0))) < 1e-6) {
             // std::cerr << abs(E0.norm()-dot(new_Vertex,unit(E0)));
             // " Collision detected between polygon No." << i << " and No." << j <<  " with a penetration depth of " << penetration_depth << " and penetration vector of " << penetration_vector << std::endl;
             penetration_depth = E0.norm();
