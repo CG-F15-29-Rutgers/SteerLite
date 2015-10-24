@@ -96,7 +96,7 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
 
     while(true)
     {
-        SteerLib::GJK_EPA::findClosestEdge(simplex, E0); // return E0 : normal vector.
+        findClosestEdge(simplex, E0); // return E0 : normal vector.
         Util::Vector new_Vertex = support(A, E0) - support(B, -E0); // new point.
         // dot(O new_vertex, projection E0) ==magnitude of EO?)
 
@@ -114,8 +114,10 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
     }
 }
 
-void SteerLib::GJK_EPA::findClosestEdge(std::vector<Util::Vector>& simplex, Util::Vector& direction)
+void SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& simplex, Util::Vector& direction)
 {
+    assert(simplex.size() > 2);
+
     Util::Vector A = simplex[0];
     Util::Vector B = simplex[1];
     Util::Vector C = simplex[2];
