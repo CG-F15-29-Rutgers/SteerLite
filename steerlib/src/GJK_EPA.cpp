@@ -16,7 +16,7 @@ Util::Vector SteerLib::GJK_EPA::support(const std::vector<Util::Vector>& shape, 
 {
     double max = 0.0;
     Util::Vector point;
-
+    max = dot(*shape.begin(),direction);
     for (std::vector<Util::Vector>::const_iterator iter = shape.begin(); iter != shape.end(); ++iter) {
         double thisDot = dot(*iter, direction);
         if (thisDot > max) {
@@ -25,6 +25,23 @@ Util::Vector SteerLib::GJK_EPA::support(const std::vector<Util::Vector>& shape, 
         }
     }
     return point;
+    
+    /*
+    Util::Vector point;
+    int max_index=0;
+    
+    for (int i=0; i<sizeof(shape);++i)
+    {
+
+        if(dot(shape[max_index],direction)<dot(shape[i],direction))
+            max_index=i;
+    }
+   point = shape[max_index];
+    std::cerr<<" max index ."<<max_index<<"value"<<dot(shape[max_index],direction)<<std::endl;
+    std::cerr<<" sizeof(shape)" <<sizeof(shape)<<std::endl;
+
+return point;*/
+ 
 }
 
 bool SteerLib::GJK_EPA::simplexContainsOrigin(std::vector<Util::Vector>& simplex, Util::Vector& direction)
@@ -42,7 +59,7 @@ bool SteerLib::GJK_EPA::simplexContainsOrigin(std::vector<Util::Vector>& simplex
     if (dot(cross(cross(CB, CA), CA), CO) > 0) {
         // origin is beyond CA
         simplex.erase(simplex.begin() + 1); // delete B
-        direction = cross(cross(CB, CA), CA);
+        direction = cross(cross(CB, CA), CA); //new direction.
         return false;
     } else if (dot(cross(cross(CA, CB), CB), CO) > 0) {
         // origin is beyond CB
@@ -59,18 +76,29 @@ bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vecto
 {
     Util::Vector D0(1, 0, 0);
     Util::Vector D1(0, 0, 1);
+    Util::Vector tempA = support(shapeA, D0);
+    Util::Vector tempB= support(shapeB,D0);
     Util::Vector A = support(shapeA, D0) - support(shapeB, -D0);
+    std::cerr<<"tempA"<<tempA<<"tempB"<<tempB<<std::endl;
     Util::Vector B = support(shapeA, D1) - support(shapeB, -D1);
+    std::cerr<<"A"<<A <<"B"<<B<<std::endl;
+   // std::cerr<<" shapeA "<<shapeA<<"shapeB"<<shapeB<<std::endl;
+  
+  std::cerr<<"A"<<A <<"B"<<B<<std::endl;
     Util::Vector AB = B - A;
     Util::Vector AO = -A;
     simplex.clear();
     simplex.push_back(A);
     simplex.push_back(B);
-    Util::Vector D = cross(cross(AB, AO), AB);
+    Util::Vector D = cross(cross(AB, AO), AB); //direction to 0
     while (true) {
-        Util::Vector C = support(shapeA, D) - support(shapeB, -D);
+        Util::Vector C = support(shapeA, D) - support(shapeB, -D); //new C vertex.
+        
+        
+        std::cerr<<"c"<<C<<"D"<<D<<std::endl;
+        
         if (dot(C, D) < 0)
-            return false;
+            return false; //no collision.s
         simplex.push_back(C);
         bool contains_origin = simplexContainsOrigin(simplex, D);
         if (contains_origin)
