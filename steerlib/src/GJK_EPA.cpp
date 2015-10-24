@@ -132,7 +132,7 @@ void SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& simplex
 
     // std::vector<Util::Vector> normal_to edge;
     min_value.push_back(10);
-    for (int i = 0; i < sizeof(normal_to_edge); ++i)
+    for (size_t i = 0; i < edge.size(); ++i)
     {
         normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction.
         min_value.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // value
