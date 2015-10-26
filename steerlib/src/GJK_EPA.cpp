@@ -1,7 +1,10 @@
-#include "obstacles/GJK_EPA.h"
 
+
+#include "obstacles/GJK_EPA.h"
+bool origin_touch_flag = false;
 SteerLib::GJK_EPA::GJK_EPA()
 {
+   // origin_touch_flag = false;
 }
 
 Util::Vector SteerLib::GJK_EPA::support(const std::vector<Util::Vector>& shape, const Util::Vector& direction)
@@ -59,90 +62,189 @@ Util::Vector SteerLib::GJK_EPA::unit(const Util::Vector& v)
 
 bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB)
 {
-    // initial directions
     Util::Vector D0(1, 0, 0);
     Util::Vector D1(0, 0, 1);
-
+    //Util::Vector tempA = support(shapeA, D0);
+    //Util::Vector tempB= support(shapeB,D0);
     Util::Vector A = support(shapeA, D0) - support(shapeB, -D0);
     Util::Vector B = support(shapeA, D1) - support(shapeB, -D1);
-
-    std::cerr << "supp(shA, D0) = " << support(shapeA, D0) << ", supp(shB, D0) = " << support(shapeB, D0) << std::endl;
-    std::cerr << "A = " << A  << ", B = " << B << std::endl;
-    // std::cerr << "shapeA = " << shapeA << ", shapeB = " << shapeB << std::endl;
-
+    
     Util::Vector AB = B - A;
     Util::Vector AO = -A;
     simplex.clear();
     simplex.push_back(A);
     simplex.push_back(B);
-    Util::Vector D = cross(cross(AB, AO), AB); // direction to 0
+    
+    if (A==(0,0,0)||B==(0,0,0))
+    {
+        origin_touch_flag = true;
+        return true;
+        
+    }
+    
+    if(dot(A,B)== -A.norm()*B.norm())
+    {
+        return true; // 0A and 0B are aligned.
+    }
+    
+    Util::Vector D = cross(cross(AB, AO), AB); //direction to 0
     while (true) {
-        Util::Vector C = support(shapeA, D) - support(shapeB, -D); // new C vertex.
-
-        std::cerr << "C = " << C << ", D = " << D << std::endl;
-
-        if (dot(C, D) < 0)
-            return false; // no collision
+        Util::Vector C = support(shapeA, D) - support(shapeB, -D); //new C vertex.
         simplex.push_back(C);
-        if (simplexContainsOrigin(simplex, D))
+        
+        if (C==(0,0,0))
+        {
+            origin_touch_flag=true;
+            return true;
+        }
+        
+        
+        
+        if (dot(C, D) < 0)
+            return false; //no collision.s
+        
+        //line simplex? then return true;
+        //if(cross((C-A),(C-B))==(0,0,0))
+        //  return true;
+        bool contains_origin = simplexContainsOrigin(simplex, D);
+        if (contains_origin)
             return true;
     }
 }
-
 void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector,  const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,  std::vector<Util::Vector>& simplex)
 {
+    
+    int size_of_simplex=simplex.size();
+    if (origin_touch_flag)
+    {
+        penetration_depth = 0;
+        if(simplex[0]!=(0,0,0))
+            penetration_vector = simplex[0]; //OA or
+        else
+            penetration_vector = simplex[1]; //OB
+        
+        return ;
+    }
+    
+    ///if (size_of_simplex==2)
+    
+    // handle line or triangle simplex.
+    
     while (true)
     {
         int edge_index;
-        Util::Vector E0 = findClosestEdge(simplex, edge_index); // return E0 : normal vector.
+        float min_distance_to_edge;
+        
+        Util::Vector E0 = findClosestEdge(A,B,simplex,edge_index,min_distance_to_edge); // return E0 : normal vector to find another vertex.
+        
+        E0 = -E0; //direction to the opposite way from origin.
         Util::Vector new_Vertex = support(A, E0) - support(B, -E0); // new point.
-        // dot(O new_vertex, projection E0) ==magnitude of EO?)
-
-        // until find minkowski
-        if (fabs(E0.norm() - dot(new_Vertex, unit(E0))) < 1e-6) {
-            // std::cerr << abs(E0.norm()-dot(new_Vertex,unit(E0)));
-            // " Collision detected between polygon No." << i << " and No." << j <<  " with a penetration depth of " << penetration_depth << " and penetration vector of " << penetration_vector << std::endl;
-            penetration_depth = E0.norm();
-            penetration_vector = unit(E0);
-            break;
+        
+        float test = dot(new_Vertex,unit(E0));
+        
+        
+        if (fabs(min_distance_to_edge - dot(new_Vertex, unit(E0))) < 1e-6) {
+            
+            penetration_depth =  min_distance_to_edge;
+            penetration_vector = unit(-E0); // toward to origin.
+            break; //loop exit.
         } else {
-            // add new point to simplex and loop
-            simplex.insert(simplex.begin() + edge_index, new_Vertex);
+            
+            simplex.insert(simplex.begin() + (edge_index+1), new_Vertex);
+            
         }
     }
 }
 
-Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& simplex, int& index)
+Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,const std::vector<Util::Vector>& simplex, int& index, float& distance)
 {
-    assert(simplex.size() > 2);
-
-    Util::Vector A = simplex[0];
-    Util::Vector B = simplex[1];
-    Util::Vector C = simplex[2];
-
+    
+    //Util::Vector test(0,0,0);
+    
+    
+    // assert(simplex.size() > 2); we have to handel line simplex.
     std::vector<Util::Vector> edge;
-    edge.push_back(B - A); // AB
-    edge.push_back(C - B); // BC
-    edge.push_back(A - C); // CA
-
+    //Util::vector normal_origin_edge1;
+    // Util::vector normal_origin_edge2;
+    Util::Vector support_edge1;
+    Util::Vector support_edge2;
+    int simplex_size=simplex.size();
+    
+    
+    
+    for (size_t i =0; i< simplex_size;++i)
+    {
+        edge.push_back(simplex[(i+1)%simplex_size]-simplex[(i)%simplex_size]); // 01 12 23 30 , when 4 vertexes i->i+1
+    }
+    
+    // line case just AB BA.
+    
+    
+    
     std::vector<float> distances;
     std::vector<Util::Vector> normal_to_edge;
-
-    // distances.push_back(10);
+    
+    
     for (size_t i = 0; i < edge.size(); ++i)
     {
-        normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction
-        distances.push_back(dot(simplex[i], unit(normal_to_edge[i]))); // distance
+        normal_to_edge.push_back(cross(cross(edge[i], -simplex[i]), edge[i])); // direction (ABcrossAO)cross AB
+        
+        if (cross(cross(edge[i], -simplex[i]), edge[i])==(0,0,0)) // edge crossing origin
+        {
+            Util::Vector normal_origin_edge1(-edge[i].z,0,edge[i].x);
+            Util::Vector normal_origin_edge2(edge[i].z,0,-edge[i].x);
+            support_edge1 = support(A,normal_origin_edge1)-support(B,-normal_origin_edge1);
+            support_edge2 = support(A,normal_origin_edge2)-support(B,-normal_origin_edge2);
+            
+            if(dot(support_edge1,normal_origin_edge1)>0)
+                if(dot(support_edge2,normal_origin_edge2)>0) //inner.
+                {
+                    for (size_t j= 0;j<simplex_size;++j)
+                    {
+                        if(support_edge1==simplex[j]) //yes then new direction.
+                        {
+                            distance = 0;
+                            return -normal_origin_edge2 ;
+                        }
+                    }
+                    distance =0; // no same vertex. this can be the next direction.
+                    return -normal_origin_edge1;
+                    
+                }
+                else //outer.
+                {
+                    distance = 0;
+                    return -normal_origin_edge1;
+                }
+            
+            
+                else //normal_origin_edge2>=0
+                {
+                    distance =0;
+                    return -normal_origin_edge2;
+                }
+            
+            
+            
+        }
+        distances.push_back(dot(-simplex[i], unit(normal_to_edge[i]))); // distance seems to be negative....-> so corrected.
     }
-
-    // find min distance
     index = 0;
-    for (size_t i = 1; i < distances.size(); ++i)
+    int distance_size = distances.size();
+    for (size_t i = 0; i < distance_size; ++i)
+    {
         if (distances[index] > distances[i])
+        {
+            
             index = i;
-
+        }
+    }
+    
+    
+    distance = distances[index]; // update min distance to edge.
     return normal_to_edge[index];
-}
+    
+   }
 
 /**
  * @brief Detect collisions using the GJK and EPA algorithms. Note
