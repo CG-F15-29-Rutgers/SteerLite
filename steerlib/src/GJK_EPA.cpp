@@ -1,10 +1,7 @@
 #include "obstacles/GJK_EPA.h"
 
-static bool origin_touch_flag = false;
-
 SteerLib::GJK_EPA::GJK_EPA()
 {
-   // origin_touch_flag = false;
 }
 
 Util::Vector SteerLib::GJK_EPA::support(const std::vector<Util::Vector>& shape, const Util::Vector& direction)
@@ -60,7 +57,7 @@ Util::Vector SteerLib::GJK_EPA::unit(const Util::Vector& v)
     return v / v.norm();
 }
 
-bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB)
+bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB, bool& touchesOrigin)
 {
     Util::Vector D0(1, 0, 0);
     Util::Vector D1(0, 0, 1);
@@ -77,7 +74,7 @@ bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vecto
 
     if (A==(0,0,0) || B==(0,0,0))
     {
-        origin_touch_flag = true;
+        touchesOrigin = true;
         return true;
     }
 
@@ -91,9 +88,9 @@ bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vecto
         Util::Vector C = support(shapeA, D) - support(shapeB, -D); //new C vertex.
         simplex.push_back(C);
 
-        if (C==(0,0,0))
+        if (C == (0,0,0))
         {
-            origin_touch_flag=true;
+            touchesOrigin = true;
             return true;
         }
 
@@ -109,10 +106,10 @@ bool SteerLib::GJK_EPA::GJK(std::vector<Util::Vector>& simplex, const std::vecto
     }
 }
 
-void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector,  const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,  std::vector<Util::Vector>& simplex)
+void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_vector,  const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,  std::vector<Util::Vector>& simplex, bool& touchesOrigin)
 {
     int size_of_simplex=simplex.size();
-    if (origin_touch_flag)
+    if (touchesOrigin)
     {
         penetration_depth = 0;
         if (simplex[0] != (0,0,0))
@@ -249,9 +246,11 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
  */
 bool SteerLib::GJK_EPA::intersect(float& penetration_depth, Util::Vector& penetration_vector, const std::vector<Util::Vector>& shapeA, const std::vector<Util::Vector>& shapeB)
 {
+    bool touchesOrigin = false;
     std::vector<Util::Vector> simplex;
-    if (GJK(simplex, shapeA, shapeB)) {
-        EPA(penetration_depth, penetration_vector, shapeA, shapeB, simplex);
+
+    if (GJK(simplex, shapeA, shapeB, touchesOrigin)) {
+        EPA(penetration_depth, penetration_vector, shapeA, shapeB, simplex, touchesOrigin);
         return true;
     } else {
         penetration_depth = 0;
