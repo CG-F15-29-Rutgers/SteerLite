@@ -259,7 +259,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
             r = _radius + agent->radius();
             d = (_position - agent->position()).length();
         } else {
-            SteerLib::ObstacleInterface* obs;
+            SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
             Vector wall_normal = calcWallNormal(obs);
             std::pair<Point, Point> line = calcWallPointsFromNormal(obs, wall_normal);
             Point min_dist = minimum_distance(line.first, line.second, _position).second;
