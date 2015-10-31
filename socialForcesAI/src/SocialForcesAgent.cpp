@@ -248,7 +248,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
         _position.z - (_radius + rad), _position.z + (_radius + rad),
         dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
 
-    for (std::set<SteerLib::SpatialDatabaseItemPtr>::iterator neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+    for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
         Vector away;
         float r;
         float d;
@@ -305,7 +305,7 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
         _position.z - (_radius + rad), _position.z + (_radius + rad),
         dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
 
-    for (std::set<SteerLib::SpatialDatabaseItemPtr>::iterator neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+    for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
         if ((*neighbor)->isAgent()) {
             SteerLib::AgentInterface* agent = dynamic_cast<SteerLib::AgentInterface*>(*neighbor);
             Vector away = normalize(_position - agent->position());
@@ -331,7 +331,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
         _position.z - (_radius + rad), _position.z + (_radius + rad),
         dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
 
-    for (std::set<SteerLib::SpatialDatabaseItemPtr>::iterator neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+    for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
         if (!(*neighbor)->isAgent()) {
             Vector away;
             float dist;
