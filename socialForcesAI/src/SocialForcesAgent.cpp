@@ -274,13 +274,13 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
 
     return force;
 }
-
+//
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
     return AGENT_MASS * (PREFERED_SPEED * _goalDirection - velocity()) / _dt;
 }
-
+//
 
 Util::Vector SocialForcesAgent::calcRepulsionForce(float dt)
 {
@@ -526,7 +526,7 @@ bool SocialForcesAgent::hasLineOfSightTo(Util::Point target)
 		&& (!gSpatialDatabase->trace(lineOfSightTestLeft,dummyt, dummyObject, dynamic_cast<SpatialDatabaseItemPtr>(this),true));
 
 }
-
+//
 
 void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNumber)
 {
@@ -592,7 +592,8 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
 		alpha=0;
 	}
 
-	_velocity = (prefForce) + repulsionForce + proximityForce;
+	_velocity = velocity()+(prefForce + repulsionForce + proximityForce)*dt; //need to check.
+    
 	// _velocity = velocity() + repulsionForce + proximityForce;
 
 	_velocity = clamp(velocity(), _SocialForcesParams.sf_max_speed);
