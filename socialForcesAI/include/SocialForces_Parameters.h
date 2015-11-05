@@ -25,10 +25,10 @@
 #define BODY_FORCE 2000//1500 // K (big K) 120000 / 80
 #define AGENT_BODY_FORCE 1500.0f
 #define SLIDING_FRICTION_FORCE 200    // k (small k) 240000 / 80 = 3000
-#define AGENT_B 0.03f // inverse proximity force importance
-#define AGENT_A 500 // 2000 / 80 Yep its just called A... inverse proximity force importance
-#define WALL_B 0.03f //  inverse proximity force importance
-#define WALL_A 500//  proximity force importance
+#define AGENT_B 0.8// inverse proximity force importance
+#define AGENT_A 40 // 2000 / 80 Yep its just called A... inverse proximity force importance
+#define WALL_B 0.8 //  inverse proximity force importance
+#define WALL_A 40//  proximity force importance
 #define FURTHEST_LOCAL_TARGET_DISTANCE 45
 
 
