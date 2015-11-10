@@ -68,14 +68,26 @@ namespace SteerLib
 	}
 
 
-
+    /**
+     * Computes a path from start to goal. Returns true and populates
+     * agent_path if successful (replaces existing values unless
+     * append_to_path is true). Otherwise returns false.
+     */
 	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path,  Util::Point start, Util::Point goal, SteerLib::GridDatabase2D * _gSpatialDatabase, bool append_to_path)
 	{
 		gSpatialDatabase = _gSpatialDatabase;
 
-		//TODO
-		std::cout<<"\nIn A*";
+        bool foundPath = false;
 
-		return false;
+        // TODO: search for path
+
+        if (foundPath) {
+            if (!append_to_path)
+                agent_path.clear();
+
+            // TODO: add points to agent_path
+        }
+
+		return foundPath;
 	}
 }
