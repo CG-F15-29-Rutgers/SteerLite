@@ -70,7 +70,7 @@ namespace SteerLib
 
     /**
      * Computes a path from start to goal. Returns true and populates
-     * agent_path if successful (replaces existing values unless
+     * agent_path if successful (replacing existing values unless
      * append_to_path is true). Otherwise returns false.
      */
 	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path,  Util::Point start, Util::Point goal, SteerLib::GridDatabase2D * _gSpatialDatabase, bool append_to_path)
@@ -79,13 +79,18 @@ namespace SteerLib
 
         bool foundPath = false;
 
+        std::vector<AStarPlannerNode> tempPath;
+        tempPath.push_back(AStarPlannerNode(start, 0, 0, NULL));
+
         // TODO: search for path
 
         if (foundPath) {
             if (!append_to_path)
                 agent_path.clear();
 
-            // TODO: add points to agent_path
+            // add planned nodes to agent path
+            for (std::vector<AStarPlannerNode>::const_iterator iter = tempPath.begin(); iter != tempPath.end(); ++iter)
+                agent_path.push_back(iter->point);
         }
 
 		return foundPath;
