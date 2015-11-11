@@ -131,11 +131,11 @@ namespace SteerLib
                 break;
             }
 
-            AStarPlannerNode current = openset[curr_index];
-
             // remove current node from open set and add to closed set
+            closedset.push_back(openset[curr_index]);
             openset.erase(openset.begin() + curr_index);
-            closedset.push_back(current);
+
+            AStarPlannerNode& current = closedset.back();
 
             std::vector<Util::Point> successors = getSuccessors(current.point);
 
@@ -166,8 +166,20 @@ namespace SteerLib
             if (!append_to_path)
                 agent_path.clear();
 
+            int goal_index = findNode(openset, goal);
+
+            // traverse tree to build path (in reverse order)
+            std::vector<Util::Point> temp;
+            AStarPlannerNode* current = &openset[goal_index];
+            while (current->point != start) {
+                temp.push_back(current->point);
+                current = current->parent;
+            }
+            temp.push_back(start);
+
             // add planned nodes to agent path
-            // TODO
+            for (std::vector<Util::Point>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); iter++)
+                agent_path.push_back(*iter);
         }
 
 		return foundPath;
