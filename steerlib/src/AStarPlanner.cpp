@@ -73,7 +73,7 @@ namespace SteerLib
 
         for (int i = minx; i <= maxx; i++) {
             for (int j = minz; j <= maxz; j++) {
-                if (i != p.x || j != p.z) {
+                if (!(i == p.x && j == p.z)) {
 //                    int index = gSpatialDatabase->getCellIndexFromLocation(i, j);
 //                    if (gSpatialDatabase->getTraversalCost(index) < COLLISION_COST)
                         successors.push_back(Util::Point(i, 0, j));
@@ -109,7 +109,7 @@ namespace SteerLib
      * agent_path if successful (replacing existing values unless
      * append_to_path is true). Otherwise returns false.
      */
-	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D * _gSpatialDatabase, bool append_to_path)
+	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path)
 	{
 		gSpatialDatabase = _gSpatialDatabase;
 
@@ -127,6 +127,7 @@ namespace SteerLib
         std::cout << "Start:     " << start << std::endl;
         std::cout << "Goal:      " << goal << std::endl;
         std::cout << "Grid size: " << gSpatialDatabase->getNumCellsX() << ", " << gSpatialDatabase->getNumCellsZ() << std::endl;
+        std::cout << "Grid origin: " << gSpatialDatabase->getOriginX() << ", " << gSpatialDatabase->getOriginZ() << std::endl;
 
         while (openset.size() > 0) {
             int curr_index = findActivationNode(openset);
@@ -141,6 +142,7 @@ namespace SteerLib
             // remove current node from open set and add to closed set
             closedset.push_back(openset[curr_index]);
             openset.erase(openset.begin() + curr_index);
+            std::cout << "Closed set size is now " << closedset.size() << std::endl;
 
             AStarPlannerNode& current = closedset.back();
 
@@ -161,6 +163,7 @@ namespace SteerLib
                 int open_index = findNode(openset, successors[i]);
                 if (open_index == -1) {
                     // node not in openset, so add it
+                    std::cout << "Adding new node to openset, parent = " << &current << std::endl;
                     openset.push_back(AStarPlannerNode(successors[i], g, f, &current));
 //                    std::cout << "Adding " << successors[i] << " to openset" << std::endl;
                 } else if (g < openset[open_index].g) {
@@ -169,6 +172,7 @@ namespace SteerLib
                     openset[open_index].f = f;
                     openset[open_index].g = g;
                     openset[open_index].parent = &current;
+                    std::cout << "Updating node in openset, parent = " << &current << std::endl;
                 }
             }
         }
@@ -186,7 +190,8 @@ namespace SteerLib
             std::vector<Util::Point> temp;
             AStarPlannerNode* current = &openset[goal_index];
             while (current->point != start) {
-                std::cout << "Next point: " << current->point << std::endl;
+                std::cout << "Next point:  " << current->point << std::endl;
+                std::cout << "Next parent: " << current->parent << std::endl;
                 temp.push_back(current->point);
                 current = current->parent;
             }
