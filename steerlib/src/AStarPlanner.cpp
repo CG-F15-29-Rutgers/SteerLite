@@ -78,6 +78,20 @@ namespace SteerLib
         return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2) + pow(p2.z - p1.z, 2));
     }
 
+    std::pair<int, double> findNextNode(std::vector<AStarPlannerNode> openset, Util::Point goal)
+    {
+        double min_dist = euclideanDistance(openset[0].point, goal);
+        int min_index = 0;
+        for (int i = 1; i < openset.size(); ++i) {
+            double dist = euclideanDistance(openset[i].point, goal);
+            if (dist < min_dist) {
+                min_dist = dist;
+                min_index = i;
+            }
+        }
+        return std::pair<int, double>(min_index, min_dist);
+    }
+
     /**
      * Computes a path from start to goal. Returns true and populates
      * agent_path if successful (replacing existing values unless
@@ -94,40 +108,32 @@ namespace SteerLib
         double f = 0;
         double g = 0;
         AStarPlannerNode* parent = NULL;
-        std::vector<AStarPlannerNode> openList;
+        std::vector<AStarPlannerNode> openset;
+        std::vector<AStarPlannerNode> closedset;
 
-        openList.push_back(AStarPlannerNode(start, 0, 0, NULL));
+        openset.push_back(AStarPlannerNode(start, 0, 0, NULL));
 
-        while (true) {
-            if (openList.size() == 0)
-                break;
+        while (openset.size() > 0) {
+            std::pair<int, double> next = findNextNode(openset, goal);
+            int min_index = next.first;
+            double min_dist = next.second;
 
-            double h_min = euclideanDistance(openList[0].point, goal);
-            int min_index = 0;
-            for (int i = 1; i < openList.size(); ++i) {
-                double h = euclideanDistance(openList[i].point, goal);
-                if (h < h_min) {
-                    h_min = h;
-                    min_index = i;
-                }
-            }
-
-            if (openList[min_index].point == goal) {
+            if (openset[min_index].point == goal) {
                 foundPath = true;
                 break;
             }
 
-            std::vector<Util::Point> successors = getSuccessors(openList[min_index].point);
+            std::vector<Util::Point> successors = getSuccessors(openset[min_index].point);
 
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {
-                f = g + h_min;
+                f = g + min_dist;
                 g = g + euclideanDistance(successors[min_index], goal);
-                openList.push_back(AStarPlannerNode(successors[i], f, g, &openList[min_index]));
+                openset.push_back(AStarPlannerNode(successors[i], f, g, &openset[min_index]));
             }
 
             // remove next node from open list
-            openList.erase(openList.begin() + min_index);
+            openset.erase(openset.begin() + min_index);
         }
 
         if (foundPath) {
