@@ -96,9 +96,11 @@ namespace SteerLib
 			*/
 
 			bool computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D * _gSpatialDatabase, bool append_to_path = false);
-		private:
+
+        private:
 			SteerLib::GridDatabase2D * gSpatialDatabase;
-            std::vector<Util::Point> getSuccessors(Util::Point p);
+
+            std::vector<Util::Point> getSuccessors(const Util::Point& p);
 	};
 
 

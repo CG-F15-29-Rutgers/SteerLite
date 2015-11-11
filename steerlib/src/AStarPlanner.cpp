@@ -40,7 +40,6 @@ namespace SteerLib
 		z_range_min = MAX(z-OBSTACLE_CLEARANCE, 0);
 		z_range_max = MIN(z+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsZ());
 
-
 		for (int i = x_range_min; i<=x_range_max; i+=GRID_STEP)
 		{
 			for (int j = z_range_min; j<=z_range_max; j+=GRID_STEP)
@@ -62,21 +61,21 @@ namespace SteerLib
 		return p;
 	}
 
-    std::vector<Util::Point> AStarPlanner::getSuccessors(Util::Point p)
+    std::vector<Util::Point> AStarPlanner::getSuccessors(const Util::Point& p)
     {
-        int minx = MAX(0, p.x - 1);
-        int maxx = MIN(p.x + 1, gSpatialDatabase->getNumCellsX());
+        int minx = MAX(gSpatialDatabase->getOriginX(), p.x - 1);
+        int maxx = MIN(p.x + 1, gSpatialDatabase->getNumCellsX() + gSpatialDatabase->getOriginX());
 
-        int minz = MAX(0, p.z - 1);
-        int maxz = MIN(p.z + 1, gSpatialDatabase->getNumCellsZ());
+        int minz = MAX(gSpatialDatabase->getOriginZ(), p.z - 1);
+        int maxz = MIN(p.z + 1, gSpatialDatabase->getNumCellsZ() + gSpatialDatabase->getOriginZ());
 
         std::vector<Util::Point> successors;
 
         for (int i = minx; i <= maxx; i++) {
             for (int j = minz; j <= maxz; j++) {
-                if (i != p.x && j != p.z) {
-                    int index = gSpatialDatabase->getCellIndexFromLocation(i, j);
-                    if (canBeTraversed(index))
+                if (i != p.x || j != p.z) {
+//                    int index = gSpatialDatabase->getCellIndexFromLocation(i, j);
+//                    if (gSpatialDatabase->getTraversalCost(index) < COLLISION_COST)
                         successors.push_back(Util::Point(i, 0, j));
                 }
             }
@@ -84,7 +83,7 @@ namespace SteerLib
         return successors;
     }
 
-    int findActivationNode(std::vector<AStarPlannerNode> openset)
+    int findActivationNode(const std::vector<AStarPlannerNode>& openset)
     {
         double min_f = openset[0].f;
         int min_index = 0;
@@ -97,10 +96,10 @@ namespace SteerLib
         return min_index;
     }
 
-    int findNode(std::vector<AStarPlannerNode> closedset, Util::Point point)
+    int findNode(const std::vector<AStarPlannerNode>& set, const Util::Point& point)
     {
-        for (size_t i = 0; i < closedset.size(); ++i)
-            if (closedset[i].point == point)
+        for (size_t i = 0; i < set.size(); ++i)
+            if (set[i].point == point)
                 return i;
         return -1;
     }
@@ -110,7 +109,7 @@ namespace SteerLib
      * agent_path if successful (replacing existing values unless
      * append_to_path is true). Otherwise returns false.
      */
-	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path,  Util::Point start, Util::Point goal, SteerLib::GridDatabase2D * _gSpatialDatabase, bool append_to_path)
+	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D * _gSpatialDatabase, bool append_to_path)
 	{
 		gSpatialDatabase = _gSpatialDatabase;
 
@@ -121,12 +120,20 @@ namespace SteerLib
 
         double f = Util::distanceBetween(start, goal);
         double g = 0;
-        openset.push_back(AStarPlannerNode(start, f, g, NULL));
+        openset.push_back(AStarPlannerNode(start, g, f, NULL));
+
+        std::cout << std::endl;
+
+        std::cout << "Start:     " << start << std::endl;
+        std::cout << "Goal:      " << goal << std::endl;
+        std::cout << "Grid size: " << gSpatialDatabase->getNumCellsX() << ", " << gSpatialDatabase->getNumCellsZ() << std::endl;
 
         while (openset.size() > 0) {
             int curr_index = findActivationNode(openset);
+//            std::cout << "Current node index: " << curr_index << std::endl;
 
             if (openset[curr_index].point == goal) {
+                std::cout << "Goal found" << std::endl;
                 foundPath = true;
                 break;
             }
@@ -138,20 +145,24 @@ namespace SteerLib
             AStarPlannerNode& current = closedset.back();
 
             std::vector<Util::Point> successors = getSuccessors(current.point);
+//            std::cout << successors.size() << " successors found" << std::endl;
 
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {
                 int closed_index = findNode(closedset, successors[i]);
-                if (closed_index != -1)
+                if (closed_index != -1) {
+//                    std::cout << "Node in closed set; ignoring" << std::endl;
                     continue;
+                }
 
-                double g = current.g + 1; // assuming 1 = distance from current to successors[i]
+                double g = current.g + Util::distanceBetween(current.point, successors[i]);
                 double f = g + Util::distanceBetween(successors[i], goal);
 
                 int open_index = findNode(openset, successors[i]);
                 if (open_index == -1) {
                     // node not in openset, so add it
-                    openset.push_back(AStarPlannerNode(successors[i], f, g, &current));
+                    openset.push_back(AStarPlannerNode(successors[i], g, f, &current));
+//                    std::cout << "Adding " << successors[i] << " to openset" << std::endl;
                 } else if (g < openset[open_index].g) {
                     // node already in openset, but this is a shorter
                     // path, so update values accordingly
@@ -162,25 +173,32 @@ namespace SteerLib
             }
         }
 
+        std::cout << "After while loop" << std::endl;
+
         if (foundPath) {
             if (!append_to_path)
                 agent_path.clear();
 
             int goal_index = findNode(openset, goal);
+            assert(goal_index != -1);
 
             // traverse tree to build path (in reverse order)
             std::vector<Util::Point> temp;
             AStarPlannerNode* current = &openset[goal_index];
             while (current->point != start) {
+                std::cout << "Next point: " << current->point << std::endl;
                 temp.push_back(current->point);
                 current = current->parent;
             }
             temp.push_back(start);
 
             // add planned nodes to agent path
-            for (std::vector<Util::Point>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); iter++)
+            for (std::vector<Util::Point>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); iter++) {
+                std::cout << iter->x << ", " << iter->y << std::endl;
                 agent_path.push_back(*iter);
-        }
+            }
+        } else
+            std::cout << "No path found" << std::endl;
 
 		return foundPath;
 	}
