@@ -62,10 +62,25 @@ namespace SteerLib
 		return p;
 	}
 
-    std::vector<Util::Point> getSuccessors(Util::Point p)
+    std::vector<Util::Point> AStarPlanner::getSuccessors(Util::Point p)
     {
+        int minx = MAX(0, p.x - 1);
+        int maxx = MIN(p.x + 1, gSpatialDatabase->getNumCellsX());
+
+        int minz = MAX(0, p.z - 1);
+        int maxz = MIN(p.z + 1, gSpatialDatabase->getNumCellsZ());
+
         std::vector<Util::Point> successors;
-        // TODO
+
+        for (int i = minx; i <= maxx; i++) {
+            for (int j = minz; j <= maxz; j++) {
+                if (i != p.x && j != p.z) {
+                    int index = gSpatialDatabase->getCellIndexFromLocation(i, j);
+                    if (canBeTraversed(index))
+                        successors.push_back(Util::Point(i, 0, j));
+                }
+            }
+        }
         return successors;
     }
 
@@ -130,7 +145,7 @@ namespace SteerLib
                 if (closed_index != -1)
                     continue;
 
-                double g = current.g + 1; // assuming 1 = distance(current, successors[i])
+                double g = current.g + 1; // assuming 1 = distance from current to successors[i]
                 double f = g + Util::distanceBetween(successors[i], goal);
 
                 int open_index = findNode(openset, successors[i]);
