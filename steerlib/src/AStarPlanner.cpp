@@ -118,9 +118,7 @@ namespace SteerLib
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
 
-        double f = Util::distanceBetween(start, goal);
-        double g = 0;
-        openset.push_back(AStarPlannerNode(start, g, f, NULL));
+        openset.push_back(AStarPlannerNode(start, 0, Util::distanceBetween(start, goal), -1));
 
         std::cout << std::endl;
 
@@ -163,16 +161,16 @@ namespace SteerLib
                 int open_index = findNode(openset, successors[i]);
                 if (open_index == -1) {
                     // node not in openset, so add it
-                    std::cout << "Adding new node to openset, parent = " << &current << std::endl;
-                    openset.push_back(AStarPlannerNode(successors[i], g, f, &current));
+                    // std::cout << "Adding new node to openset, parent = " << &current << std::endl;
+                    openset.push_back(AStarPlannerNode(successors[i], g, f, closedset.size() - 1));
 //                    std::cout << "Adding " << successors[i] << " to openset" << std::endl;
                 } else if (g < openset[open_index].g) {
                     // node already in openset, but this is a shorter
                     // path, so update values accordingly
                     openset[open_index].f = f;
                     openset[open_index].g = g;
-                    openset[open_index].parent = &current;
-                    std::cout << "Updating node in openset, parent = " << &current << std::endl;
+                    openset[open_index].parent_index = closedset.size() - 1;
+                    // std::cout << "Updating node in openset, parent = " << &current << std::endl;
                 }
             }
         }
@@ -188,12 +186,12 @@ namespace SteerLib
 
             // traverse tree to build path (in reverse order)
             std::vector<Util::Point> temp;
-            AStarPlannerNode* current = &openset[goal_index];
+            const AStarPlannerNode* current = &openset[goal_index];
             while (current->point != start) {
                 std::cout << "Next point:  " << current->point << std::endl;
-                std::cout << "Next parent: " << current->parent << std::endl;
+                std::cout << "Next parent: " << current->parent_index << std::endl;
                 temp.push_back(current->point);
-                current = current->parent;
+                current = &closedset[current->parent_index];
             }
             temp.push_back(start);
 

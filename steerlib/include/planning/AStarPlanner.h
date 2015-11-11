@@ -21,10 +21,10 @@ namespace SteerLib
      *
      * @attributes
      *
-     * f      : the f value of the node
-     * g      : the cost from the start, for the node
-     * point  : the point in (x,0,z) space that corresponds to the current node
-     * parent : the pointer to the parent AStarPlannerNode, so that retracing the path is possible.
+     * f            : the f value of the node
+     * g            : the cost from the start, for the node
+     * point        : the point in (x,0,z) space that corresponds to the current node
+     * parent_index : the index to the parent AStarPlannerNode in the closed set, so that retracing the path is possible.
      *
      * @operators
      *
@@ -35,14 +35,14 @@ namespace SteerLib
 			double f;
 			double g;
 			Util::Point point;
-			AStarPlannerNode* parent;
+			size_t parent_index;
 
-			AStarPlannerNode(Util::Point _point, double _g, double _f, AStarPlannerNode* _parent)
+			AStarPlannerNode(Util::Point _point, double _g, double _f, size_t _parent_index)
 			{
 				f = _f;
 				point = _point;
 				g = _g;
-				parent = _parent;
+				parent_index = _parent_index;
 			}
 
 			bool operator<(const AStarPlannerNode& other) const
