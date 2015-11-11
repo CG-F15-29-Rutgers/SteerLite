@@ -118,7 +118,7 @@ namespace SteerLib
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
 
-        openset.push_back(AStarPlannerNode(start, 0, Util::distanceBetween(start, goal), -1));
+        openset.push_back(AStarPlannerNode(start, Util::distanceBetween(start, goal), 0, -1));
 
         std::cout << std::endl;
 
@@ -162,7 +162,7 @@ namespace SteerLib
                 if (open_index == -1) {
                     // node not in openset, so add it
                     // std::cout << "Adding new node to openset, parent = " << &current << std::endl;
-                    openset.push_back(AStarPlannerNode(successors[i], g, f, closedset.size() - 1));
+                    openset.push_back(AStarPlannerNode(successors[i], f, g, closedset.size() - 1));
 //                    std::cout << "Adding " << successors[i] << " to openset" << std::endl;
                 } else if (g < openset[open_index].g) {
                     // node already in openset, but this is a shorter

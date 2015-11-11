@@ -37,7 +37,7 @@ namespace SteerLib
 			Util::Point point;
 			size_t parent_index;
 
-			AStarPlannerNode(Util::Point _point, double _g, double _f, size_t _parent_index)
+			AStarPlannerNode(Util::Point _point, double _f, double _g, size_t _parent_index)
 			{
 				f = _f;
 				point = _point;
