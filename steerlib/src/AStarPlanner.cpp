@@ -67,6 +67,16 @@ namespace SteerLib
 		return p;
 	}
 
+    std::vector<Util::Point> getSuccessors(Util::Point p)
+    {
+        std::vector<Util::Point> successors;
+        return successors;
+    }
+
+    double euclideanDistance(Util::Point p1, Util::Point p2)
+    {
+        return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2) + pow(p2.z - p1.z, 2));
+    }
 
     /**
      * Computes a path from start to goal. Returns true and populates
@@ -80,17 +90,53 @@ namespace SteerLib
         bool foundPath = false;
 
         std::vector<AStarPlannerNode> tempPath;
-        tempPath.push_back(AStarPlannerNode(start, 0, 0, NULL));
+        Util::Point currPoint = start;
+        double f = 0;
+        double g = 0;
+        AStarPlannerNode* parent = NULL;
+        std::vector<AStarPlannerNode> openList;
 
-        // TODO: search for path
+        openList.push_back(AStarPlannerNode(start, 0, 0, NULL));
+
+        while (true) {
+            if (openList.size() == 0)
+                break;
+
+            double h_min = euclideanDistance(openList[0].point, goal);
+            int min_index = 0;
+            for (int i = 1; i < openList.size(); ++i) {
+                double h = euclideanDistance(openList[i].point, goal);
+                if (h < h_min) {
+                    h_min = h;
+                    min_index = i;
+                }
+            }
+
+            if (openList[min_index].point == goal) {
+                foundPath = true;
+                break;
+            }
+
+            std::vector<Util::Point> successors = getSuccessors(openList[min_index].point);
+
+            // add successors to open list
+            for (int i = 0; i < successors.size(); ++i) {
+                f = g + h_min;
+                g = g + euclideanDistance(successors[min_index], goal);
+                openList.push_back(AStarPlannerNode(successors[i], f, g, &openList[min_index]));
+            }
+
+            // remove next node from open list
+            openList.erase(openList.begin() + min_index);
+        }
 
         if (foundPath) {
             if (!append_to_path)
                 agent_path.clear();
 
             // add planned nodes to agent path
-            for (std::vector<AStarPlannerNode>::const_iterator iter = tempPath.begin(); iter != tempPath.end(); ++iter)
-                agent_path.push_back(iter->point);
+            // for (std::vector<AStarPlannerNode>::const_iterator iter = tempPath.begin(); iter != tempPath.end(); ++iter)
+            //     agent_path.push_back(iter->point);
         }
 
 		return foundPath;
