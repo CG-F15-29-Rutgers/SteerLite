@@ -3,18 +3,16 @@
 // See license.txt for complete license.
 //
 
-
 #include <vector>
 #include <stack>
 #include <set>
 #include <map>
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
 #include <functional>
 #include <queue>
 #include <math.h>
 #include "planning/AStarPlanner.h"
-
 
 #define COLLISION_COST  1000
 #define GRID_STEP  1
@@ -28,7 +26,7 @@ namespace SteerLib
 
 	AStarPlanner::~AStarPlanner(){}
 
-	bool AStarPlanner::canBeTraversed ( int id ) 
+	bool AStarPlanner::canBeTraversed ( int id )
 	{
 		double traversal_cost = 0;
 		int current_id = id;
@@ -49,16 +47,13 @@ namespace SteerLib
 			{
 				int index = gSpatialDatabase->getCellIndexFromGridCoords( i, j );
 				traversal_cost += gSpatialDatabase->getTraversalCost ( index );
-				
 			}
 		}
 
-		if ( traversal_cost > COLLISION_COST ) 
+		if ( traversal_cost > COLLISION_COST )
 			return false;
 		return true;
 	}
-
-
 
 	Util::Point AStarPlanner::getPointFromGridIndex(int id)
 	{
@@ -70,26 +65,29 @@ namespace SteerLib
     std::vector<Util::Point> getSuccessors(Util::Point p)
     {
         std::vector<Util::Point> successors;
+        // TODO
         return successors;
     }
 
-    double euclideanDistance(Util::Point p1, Util::Point p2)
+    int findActivationNode(std::vector<AStarPlannerNode> openset)
     {
-        return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2) + pow(p2.z - p1.z, 2));
-    }
-
-    std::pair<int, double> findNextNode(std::vector<AStarPlannerNode> openset, Util::Point goal)
-    {
-        double min_dist = euclideanDistance(openset[0].point, goal);
+        double min_f = openset[0].f;
         int min_index = 0;
         for (int i = 1; i < openset.size(); ++i) {
-            double dist = euclideanDistance(openset[i].point, goal);
-            if (dist < min_dist) {
-                min_dist = dist;
+            if (openset[i].f < min_f) {
+                min_f = openset[i].f;
                 min_index = i;
             }
         }
-        return std::pair<int, double>(min_index, min_dist);
+        return min_index;
+    }
+
+    int findNode(std::vector<AStarPlannerNode> closedset, Util::Point point)
+    {
+        for (size_t i = 0; i < closedset.size(); ++i)
+            if (closedset[i].point == point)
+                return i;
+        return -1;
     }
 
     /**
@@ -103,37 +101,50 @@ namespace SteerLib
 
         bool foundPath = false;
 
-        std::vector<AStarPlannerNode> tempPath;
-        Util::Point currPoint = start;
-        double f = 0;
-        double g = 0;
-        AStarPlannerNode* parent = NULL;
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
 
-        openset.push_back(AStarPlannerNode(start, 0, 0, NULL));
+        double f = Util::distanceBetween(start, goal);
+        double g = 0;
+        openset.push_back(AStarPlannerNode(start, f, g, NULL));
 
         while (openset.size() > 0) {
-            std::pair<int, double> next = findNextNode(openset, goal);
-            int min_index = next.first;
-            double min_dist = next.second;
+            int curr_index = findActivationNode(openset);
 
-            if (openset[min_index].point == goal) {
+            if (openset[curr_index].point == goal) {
                 foundPath = true;
                 break;
             }
 
-            std::vector<Util::Point> successors = getSuccessors(openset[min_index].point);
+            AStarPlannerNode current = openset[curr_index];
+
+            // remove current node from open set and add to closed set
+            openset.erase(openset.begin() + curr_index);
+            closedset.push_back(current);
+
+            std::vector<Util::Point> successors = getSuccessors(current.point);
 
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {
-                f = g + min_dist;
-                g = g + euclideanDistance(successors[min_index], goal);
-                openset.push_back(AStarPlannerNode(successors[i], f, g, &openset[min_index]));
-            }
+                int closed_index = findNode(closedset, successors[i]);
+                if (closed_index != -1)
+                    continue;
 
-            // remove next node from open list
-            openset.erase(openset.begin() + min_index);
+                double g = current.g + 1; // assuming 1 = distance(current, successors[i])
+                double f = g + Util::distanceBetween(successors[i], goal);
+
+                int open_index = findNode(openset, successors[i]);
+                if (open_index == -1) {
+                    // node not in openset, so add it
+                    openset.push_back(AStarPlannerNode(successors[i], f, g, &current));
+                } else if (g < openset[open_index].g) {
+                    // node already in openset, but this is a shorter
+                    // path, so update values accordingly
+                    openset[open_index].f = f;
+                    openset[open_index].g = g;
+                    openset[open_index].parent = &current;
+                }
+            }
         }
 
         if (foundPath) {
@@ -141,8 +152,7 @@ namespace SteerLib
                 agent_path.clear();
 
             // add planned nodes to agent path
-            // for (std::vector<AStarPlannerNode>::const_iterator iter = tempPath.begin(); iter != tempPath.end(); ++iter)
-            //     agent_path.push_back(iter->point);
+            // TODO
         }
 
 		return foundPath;
