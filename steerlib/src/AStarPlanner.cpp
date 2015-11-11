@@ -74,8 +74,8 @@ namespace SteerLib
         for (int i = minx; i <= maxx; i++) {
             for (int j = minz; j <= maxz; j++) {
                 if (!(i == p.x && j == p.z)) {
-//                    int index = gSpatialDatabase->getCellIndexFromLocation(i, j);
-//                    if (gSpatialDatabase->getTraversalCost(index) < COLLISION_COST)
+                    int index = gSpatialDatabase->getCellIndexFromLocation(i, j);
+                    if (gSpatialDatabase->getTraversalCost(index) < COLLISION_COST)
                         successors.push_back(Util::Point(i, 0, j));
                 }
             }
