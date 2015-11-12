@@ -163,7 +163,7 @@ namespace SteerLib
 
     float manhattanDistance(const Util::Point& p1, const Util::Point& p2)
     {
-        return (abs(p2.x - p1.x) + abs(p2.y - p1.y));
+        return (abs(p2.x - p1.x) + abs(p2.y - p1.y) + abs(p2.z - p1.z));
     }
 
     /**
