@@ -128,10 +128,15 @@ void SearchAgent::updateAI(float timeStamp, float dt, unsigned int frameNumber)
 	{	
 		if(!_goalQueue.empty())
 		{
+            Util::AxisAlignedBox oldBounds(__position.x - _radius, __position.x + _radius, 0.0f, 0.0f, __position.z - _radius, __position.z + _radius);
+
 			__position = _goalQueue.front().targetLocation;
 			std::cout<<"Waypoint: "<< __position;
 			_goalQueue.pop();
 			last_waypoint++;
+
+            Util::AxisAlignedBox newBounds(__position.x - _radius, __position.x + _radius, 0.0f, 0.0f, __position.z - _radius, __position.z + _radius);
+            gSpatialDatabase->updateObject( this, oldBounds, newBounds);
 		}
 	}
 }
