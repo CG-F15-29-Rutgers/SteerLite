@@ -83,17 +83,69 @@ namespace SteerLib
         return successors;
     }
 
-    int findActivationNode(const std::vector<AStarPlannerNode>& openset)
+    std::vector<int> getMinIndices(const std::vector<AStarPlannerNode>& openset)
     {
+        assert(openset.size() > 0);
+
         double min_f = openset[0].f;
         int min_index = 0;
+        std::vector<int> min_indices;
+        min_indices.push_back(0);
         for (int i = 1; i < openset.size(); ++i) {
             if (openset[i].f < min_f) {
                 min_f = openset[i].f;
-                min_index = i;
+                min_indices.clear();
+                min_indices.push_back(i);
+            } else if (openset[i].f == min_f) {
+                min_indices.push_back(i);
             }
         }
-        return min_index;
+
+        return min_indices;
+    }
+
+    /**
+     * Finds the next node from the open set to activate, by finding
+     * the node with the lowest f value. In the case of multiple such
+     * nodes, it chooses the one with the lowest g value.
+     */
+    int findActivationNodeLowestG(const std::vector<AStarPlannerNode>& openset)
+    {
+        std::vector<int> min_indices = getMinIndices(openset);
+
+        double min_g = openset[min_indices[0]].g;
+        double min_g_index = min_indices[0];
+
+        for (int i = 1; i < min_indices.size(); ++i) {
+            if (openset[min_indices[i]].g < min_g) {
+                min_g = openset[min_indices[i]].g;
+                min_g_index = min_indices[i];
+            }
+        }
+
+        return min_g_index;
+    }
+
+    /**
+     * Finds the next node from the open set to activate, by finding
+     * the node with the lowest f value. In the case of multiple such
+     * nodes, it chooses the one with the highest g value.
+     */
+    int findActivationNodeHighestG(const std::vector<AStarPlannerNode>& openset)
+    {
+        std::vector<int> min_indices = getMinIndices(openset);
+
+        double max_g = openset[min_indices[0]].g;
+        double max_g_index = min_indices[0];
+
+        for (int i = 1; i < min_indices.size(); ++i) {
+            if (openset[min_indices[i]].g > max_g) {
+                max_g = openset[min_indices[i]].g;
+                max_g_index = min_indices[i];
+            }
+        }
+
+        return max_g_index;
     }
 
     int findNode(const std::vector<AStarPlannerNode>& set, const Util::Point& point)
@@ -143,7 +195,7 @@ namespace SteerLib
         std::cout << "Grid origin: " << gSpatialDatabase->getOriginX() << ", " << gSpatialDatabase->getOriginZ() << std::endl;
 
         while (openset.size() > 0) {
-            int curr_index = findActivationNode(openset);
+            int curr_index = findActivationNodeLowestG(openset);
 //            std::cout << "Current node index: " << curr_index << std::endl;
 
             if (openset[curr_index].point == goal) {
