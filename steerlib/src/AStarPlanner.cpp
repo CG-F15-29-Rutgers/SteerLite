@@ -125,13 +125,15 @@ namespace SteerLib
 
         bool foundPath = false;
 
+        float weight = 1; // for weighted A*
+
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
 
         // Set heuristic to Euclidean or Manhattan distance
         float (*heuristic)(const Util::Point& p1, const Util::Point& p2) = euclideanDistance;
 
-        openset.push_back(AStarPlannerNode(start, heuristic(start, goal), 0, -1));
+        openset.push_back(AStarPlannerNode(start, weight * heuristic(start, goal), 0, -1));
 
         std::cout << std::endl;
 
@@ -169,7 +171,7 @@ namespace SteerLib
                 }
 
                 double g = current.g + euclideanDistance(current.point, successors[i]);
-                double f = g + heuristic(successors[i], goal);
+                double f = g + weight * heuristic(successors[i], goal);
 
                 int open_index = findNode(openset, successors[i]);
                 if (open_index == -1) {
