@@ -222,7 +222,8 @@ namespace SteerLib
                     continue;
                 }
 
-                double g = current.g + euclideanDistance(current.point, successors[i]);
+                double g = current.g + 1; // part 1
+                // double g = current.g + euclideanDistance(current.point, successors[i]); // part 3
                 double f = g + weight * heuristic(successors[i], goal);
 
                 int open_index = findNode(openset, successors[i]);
