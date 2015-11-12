@@ -222,7 +222,7 @@ namespace SteerLib
                     continue;
                 }
 
-                double g = current.g + 1; // part 1
+                double g = current.g + heuristic(current.point,successors[i]); // part 1
                 // double g = current.g + euclideanDistance(current.point, successors[i]); // part 3
                 double f = g + weight * heuristic(successors[i], goal);
 
