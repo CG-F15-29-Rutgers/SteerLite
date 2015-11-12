@@ -104,6 +104,16 @@ namespace SteerLib
         return -1;
     }
 
+    float euclideanDistance(const Util::Point& p1, const Util::Point& p2)
+    {
+        return Util::distanceBetween(p1, p2);
+    }
+
+    float manhattanDistance(const Util::Point& p1, const Util::Point& p2)
+    {
+        return (abs(p2.x - p1.x) + abs(p2.y - p1.y));
+    }
+
     /**
      * Computes a path from start to goal. Returns true and populates
      * agent_path if successful (replacing existing values unless
@@ -118,7 +128,10 @@ namespace SteerLib
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
 
-        openset.push_back(AStarPlannerNode(start, Util::distanceBetween(start, goal), 0, -1));
+        // Set heuristic to Euclidean or Manhattan distance
+        float (*heuristic)(const Util::Point& p1, const Util::Point& p2) = euclideanDistance;
+
+        openset.push_back(AStarPlannerNode(start, heuristic(start, goal), 0, -1));
 
         std::cout << std::endl;
 
@@ -155,8 +168,8 @@ namespace SteerLib
                     continue;
                 }
 
-                double g = current.g + Util::distanceBetween(current.point, successors[i]);
-                double f = g + Util::distanceBetween(successors[i], goal);
+                double g = current.g + euclideanDistance(current.point, successors[i]);
+                double f = g + heuristic(successors[i], goal);
 
                 int open_index = findNode(openset, successors[i]);
                 if (open_index == -1) {
