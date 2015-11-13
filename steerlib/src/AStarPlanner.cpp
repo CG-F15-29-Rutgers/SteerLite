@@ -107,6 +107,17 @@ namespace SteerLib
     /**
      * Finds the next node from the open set to activate, by finding
      * the node with the lowest f value. In the case of multiple such
+     * nodes, it returns the first in the open set.
+     */
+    int findActivationNodeFirst(const std::vector<AStarPlannerNode>& openset)
+    {
+        std::vector<int> min_indices = getMinIndices(openset);
+        return min_indices[0];
+    }
+
+    /**
+     * Finds the next node from the open set to activate, by finding
+     * the node with the lowest f value. In the case of multiple such
      * nodes, it chooses the one with the lowest g value.
      */
     int findActivationNodeLowestG(const std::vector<AStarPlannerNode>& openset)
