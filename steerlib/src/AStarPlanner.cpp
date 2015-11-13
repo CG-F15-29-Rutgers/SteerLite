@@ -198,19 +198,10 @@ namespace SteerLib
 
         openset.push_back(AStarPlannerNode(start, weight * heuristic(start, goal), 0, -1));
 
-        std::cout << std::endl;
-
-        std::cout << "Start:     " << start << std::endl;
-        std::cout << "Goal:      " << goal << std::endl;
-        std::cout << "Grid size: " << gSpatialDatabase->getNumCellsX() << ", " << gSpatialDatabase->getNumCellsZ() << std::endl;
-        std::cout << "Grid origin: " << gSpatialDatabase->getOriginX() << ", " << gSpatialDatabase->getOriginZ() << std::endl;
-
         while (openset.size() > 0) {
             int curr_index = findActivationNodeLowestG(openset);
-//            std::cout << "Current node index: " << curr_index << std::endl;
 
             if (openset[curr_index].point == goal) {
-                std::cout << "Goal found" << std::endl;
                 foundPath = true;
                 break;
             }
@@ -218,18 +209,15 @@ namespace SteerLib
             // remove current node from open set and add to closed set
             closedset.push_back(openset[curr_index]);
             openset.erase(openset.begin() + curr_index);
-            std::cout << "Closed set size is now " << closedset.size() << std::endl;
 
             AStarPlannerNode& current = closedset.back();
 
             std::vector<Util::Point> successors = getSuccessors(current.point);
-//            std::cout << successors.size() << " successors found" << std::endl;
 
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {
                 int closed_index = findNode(closedset, successors[i]);
                 if (closed_index != -1) {
-//                    std::cout << "Node in closed set; ignoring" << std::endl;
                     continue;
                 }
 
@@ -240,21 +228,16 @@ namespace SteerLib
                 int open_index = findNode(openset, successors[i]);
                 if (open_index == -1) {
                     // node not in openset, so add it
-                    // std::cout << "Adding new node to openset, parent = " << &current << std::endl;
                     openset.push_back(AStarPlannerNode(successors[i], f, g, closedset.size() - 1));
-//                    std::cout << "Adding " << successors[i] << " to openset" << std::endl;
                 } else if (g < openset[open_index].g) {
                     // node already in openset, but this is a shorter
                     // path, so update values accordingly
                     openset[open_index].f = f;
                     openset[open_index].g = g;
                     openset[open_index].parent_index = closedset.size() - 1;
-                    // std::cout << "Updating node in openset, parent = " << &current << std::endl;
                 }
             }
         }
-
-        std::cout << "After while loop" << std::endl;
 
         if (foundPath) {
             if (!append_to_path)
@@ -267,8 +250,6 @@ namespace SteerLib
             std::vector<Util::Point> temp;
             const AStarPlannerNode* current = &openset[goal_index];
             while (current->point != start) {
-                std::cout << "Next point:  " << current->point << std::endl;
-                std::cout << "Next parent: " << current->parent_index << std::endl;
                 temp.push_back(current->point);
                 current = &closedset[current->parent_index];
             }
@@ -276,11 +257,9 @@ namespace SteerLib
 
             // add planned nodes to agent path
             for (std::vector<Util::Point>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); iter++) {
-                std::cout << iter->x << ", " << iter->y << std::endl;
                 agent_path.push_back(*iter);
             }
-        } else
-            std::cout << "No path found" << std::endl;
+        }
 
 		return foundPath;
 	}
