@@ -45,7 +45,8 @@ TARGET_TYPE := dynamicLibrary
 
 
 # The output binary you want to create.
-TARGET_NAME := sfAI.o
+#TARGET_NAME := sfAI.o
+TARGET_NAME := sfAI_Rut29.o
 
 # The paths where source files are located.
 SOURCE_DIRS := ../src/

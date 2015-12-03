@@ -97,7 +97,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 const char * CommandLineEngineDriver::getData()
 {
 	ModuleInterface * moduleInterface = (_engine->getModule("scenario"));
-	ModuleInterface * aimoduleInterface = (_engine->getModule("sfAI"));
+	ModuleInterface * aimoduleInterface = (_engine->getModule("sfAI_Rut29"));
 	std::string out;
 	char * outptr;
 	if ( moduleInterface != NULL && (aimoduleInterface != NULL) )
@@ -131,7 +131,7 @@ LogData * CommandLineEngineDriver::getLogData()
 {
 	ModuleInterface * moduleInterface = (_engine->getModule("scenario"));
 	LogData * lD = moduleInterface->getLogData();
-	ModuleInterface * aimoduleInterface = (_engine->getModule("sfAI"));
+	ModuleInterface * aimoduleInterface = (_engine->getModule("sfAI_Rut29"));
 
 	// TODO use this properly instead.
 	std::vector<SteerLib::ModuleInterface*> modules = _engine-> getAllModules();

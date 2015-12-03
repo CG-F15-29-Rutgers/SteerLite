@@ -61,7 +61,14 @@ if [ "$1" == "win32" ]; then
     rm -rf ../socialForcesAI/build/win32/Release
     rm -rf ../socialForcesAI/build/win32/ReleaseAVX
     rm -rf ../socialForcesAI/build/win32/Debug
-    rm -f ../socialForcesAI/build/win32/sfAI.vcproj.*.user
+    rm -f ../socialForcesAI/build/win32/sfAI_Rut29.vcproj.*.user
+
+rm -rf ../socialForcesAI/build/win32/Release
+rm -rf ../socialForcesAI/build/win32/ReleaseAVX
+rm -rf ../socialForcesAI/build/win32/Debug
+rm -f ../socialForcesAI/build/win32/sfAI.vcproj.*.user
+
+
 
     rm -rf ../collisionAI/build/win32/Release
     rm -rf ../collisionAI/build/win32/ReleaseAVX
@@ -134,6 +141,12 @@ if [ -d lib/ ]; then
     	rm -f lib/libsfAI.so
 		rm -f lib/sfAI.o
     fi
+
+    if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI_Rut29" ]]; then
+    rm -f lib/libsfAI_Rut29.so
+    rm -f lib/sfAI_Rut29.o
+    fi
+
     rmdir lib/
 fi
 
@@ -150,6 +163,9 @@ if [ -d modules/ ]; then
     fi
     if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI" ]]; then
     	rm -f modules/sfAI.o
+    fi
+    if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI_Rut29" ]]; then
+    rm -f modules/sfAI_Rut29.o
     fi
 
     if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "collisionAI" ]]; then
@@ -229,6 +245,13 @@ if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI" ]]; then
 	pushd ../socialForcesAI/build > /dev/null
 	$MAKE clean > /dev/null
 	popd > /dev/null
+fi
+
+if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI_Rut29" ]]; then
+echo "Cleaning Social Forces"
+pushd ../socialForcesAI/build > /dev/null
+$MAKE clean > /dev/null
+popd > /dev/null
 fi
 
 if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "collisionAI" ]]; then

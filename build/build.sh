@@ -548,6 +548,17 @@ if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI" ]]; then
 	popd > /dev/null
 fi
 
+
+if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI_Rut29" ]]; then
+echo "==================================="
+echo "Building SOCIAL FORCES_our_own module"
+echo "==================================="
+pushd ../socialForcesAI/build > /dev/null
+$MAKE $MAKE_ARGS
+SOCIAL_FORCES_BUILD_RETURN_CODE=$?
+popd > /dev/null
+fi
+
 if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "curveAI" ]]; then
 	echo "==================================="
 	echo "Building Curve module"
@@ -642,11 +653,15 @@ if [ $PPRAI_BUILD_RETURN_CODE == 0 ]; then
 fi
 
 if [ $SOCIAL_FORCES_BUILD_RETURN_CODE == 0 ]; then
-    echo "copying sfAI.o to $MODULES_DIR"
+    echo "copying sfAI=.o to $MODULES_DIR"
     cp ../socialForcesAI/build/sfAI.o $MODULES_DIR
     SOCIAL_FORCES_INSTALL_RETURN_CODE=$?
 fi
-
+if [ $SOCIAL_FORCES_BUILD_RETURN_CODE == 0 ]; then
+echo "copying sfAI=.o to $MODULES_DIR"
+cp ../socialForcesAI/build/sfAI_Rut29.o $MODULES_DIR
+SOCIAL_FORCES_INSTALL_RETURN_CODE=$?
+fi
 echo ""
 echo "Summary:"
 
