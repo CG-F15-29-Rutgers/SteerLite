@@ -129,6 +129,42 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 		// engineInfo->getSpatialDatabase()->updateObject( this, oldBounds, newBounds);
 	}
 
+    // Get test case name, excluding any .xml extension
+    std::string testcase = (*engineInfo->getModuleOptions("testCasePlayer").find("testcase")).second;
+    std::transform(testcase.begin(), testcase.end(), testcase.begin(), ::tolower);
+    std::string ending = ".xml";
+
+    if (testcase.length() >= ending.length())
+        if (testcase.compare(testcase.length() - ending.length(), ending.length(), ending) == 0)
+            testcase.erase(testcase.length() - ending.length(), ending.length());
+
+    std::cout << "Using testcase: " << testcase << std::endl;
+
+    // Set testcase-specific parameters
+    if (testcase == "plane_egress") {
+        // TODO
+    } else if (testcase == "plane_ingress") {
+        // TODO
+    } else if (testcase == "crowd_crossing") {
+        // TODO
+    } else if (testcase == "office-complex") {
+        // TODO
+    } else if (testcase == "hallway-four-way-rounded-roundabout") {
+        // TODO
+    } else if (testcase == "bottleneck-squeeze") {
+        // TODO
+    } else if (testcase == "doorway-two-way") {
+        // TODO
+    } else if (testcase == "double-squeeze") {
+        // TODO
+    } else if (testcase == "wall-squeeze") {
+        // TODO
+    } else if (testcase == "hallway-two-way") {
+        // TODO
+    } else if (testcase == "maze") {
+        // TODO
+    }
+
 	_enabled = true;
 
 	if (initialConditions.goals.size() == 0)
