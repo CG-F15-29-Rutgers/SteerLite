@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ###############################
 # Computer Geraphic Course F15
 # Grading Script
@@ -7,9 +9,12 @@
 
 import subprocess
 import sys
-from termcolor import colored
+# from termcolor import colored
 import os.path
 import re
+
+def colored(s, color):
+        print(s)
 
 def main():
 	if len(sys.argv) < 2:

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ###############################
 # Computer Geraphic Course F15
 # Grading Script
@@ -9,9 +11,12 @@ import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
 import subprocess
 import sys
-from termcolor import colored
+# from termcolor import colored
 import re
 import os.path
+
+def colored(s, color):
+        print(s)
 
 def main():
 	if len(sys.argv) < 3:
