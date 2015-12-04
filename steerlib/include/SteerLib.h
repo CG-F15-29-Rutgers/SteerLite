@@ -35,6 +35,7 @@
 #include "obstacles/CircleObstacle.h"
 
 #include "planning/BestFirstSearchPlanner.h"
+#include "planning/AStarPlanner.h"
 
 #include "simulation/Camera.h"
 #include "simulation/Clock.h"
