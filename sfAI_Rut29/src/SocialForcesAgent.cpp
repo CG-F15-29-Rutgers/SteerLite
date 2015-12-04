@@ -159,7 +159,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 		}
 	}
 
-	runLongTermPlanning();
+	//runLongTermPlanning(); diana.
+    runASTARplanning(); //working with A* path finder.
 
 	// std::cout << "first waypoint: " << _waypoints.front() << " agents position: " << position() << std::endl;
 	/*
@@ -815,6 +816,49 @@ void SocialForcesAgent::updateLocalTarget()
 	}
 }
 
+
+bool SocialForcesAgent::runASTARplanning() //Diana added.
+{
+    
+    _midTermPath.clear();
+   // _waypoints.clear(); //midterm path clear?
+    //==========================================================================
+    
+    // run the main a-star search here
+    
+    std::vector<Util::Point> agentPath;
+    Util::Point pos = position(); //start_position.
+    
+    /*
+     if (gEngine->isAgentSelected(this))
+     {
+     // std::cout << "agent" << this->id() << " is running planning again" << std::endl;
+     }
+     */
+    
+    AStarPlanner Astarpath; //ASTAR.
+    
+    if(!Astarpath.computePath(agentPath,pos, _goalQueue.front().targetLocation,gSpatialDatabase, false))
+    {
+        return false;
+    }
+    
+    
+    // Push path into _waypoints
+    
+    // Skip first node that is at location of agent
+    for  (int i=1; i < agentPath.size(); i++)
+    {
+        
+        _midTermPath.push_back(agentPath.at(i));
+        if ((i % FURTHEST_LOCAL_TARGET_DISTANCE) == 0)
+        {
+            _waypoints.push_back(agentPath.at(i));
+        }    }
+    
+    return true;
+    
+}
 
 /**
  * finds a path to the current goal

@@ -82,7 +82,7 @@ void SocialForcesAIModule::init( const SteerLib::OptionDictionary & options, Ste
 	gShowStats = false;
 	logStats = false;
 	gShowAllStats = false;
-	logFilename = "sfAI.log";
+	logFilename = "sfAI_Rut29.log";
 
 	sf_acceleration = ACCELERATION;
 	sf_personal_space_threshold = PERSONAL_SPACE_THRESHOLD;
