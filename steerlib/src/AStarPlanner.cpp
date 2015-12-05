@@ -16,7 +16,7 @@
 
 #define COLLISION_COST  1000
 #define GRID_STEP  1
-#define OBSTACLE_CLEARANCE 20//1
+#define OBSTACLE_CLEARANCE 0
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
 
@@ -240,6 +240,7 @@ namespace SteerLib
             int curr_grid_index = _gSpatialDatabase->getCellIndexFromLocation(openset[curr_index].point);
 
             if (goal_grid_index == curr_grid_index) {
+                std::cout << "Found path" << std::endl;
                 foundPath = true;
                 break;
             }
