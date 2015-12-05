@@ -61,14 +61,12 @@ if [ "$1" == "win32" ]; then
     rm -rf ../socialForcesAI/build/win32/Release
     rm -rf ../socialForcesAI/build/win32/ReleaseAVX
     rm -rf ../socialForcesAI/build/win32/Debug
-    rm -f ../socialForcesAI/build/win32/sfAI_Rut29.vcproj.*.user
+    rm -f ../socialForcesAI/build/win32/sfAI.vcproj.*.user
 
-rm -rf ../socialForcesAI/build/win32/Release
-rm -rf ../socialForcesAI/build/win32/ReleaseAVX
-rm -rf ../socialForcesAI/build/win32/Debug
-rm -f ../socialForcesAI/build/win32/sfAI.vcproj.*.user
-
-
+    rm -rf ../sfAI_Rut29/build/win32/Release
+    rm -rf ../sfAI_Rut29/build/win32/ReleaseAVX
+    rm -rf ../sfAI_Rut29/build/win32/Debug
+    rm -f ../sfAI_Rut29/build/win32/sfAI_Rut29.vcproj.*.user
 
     rm -rf ../collisionAI/build/win32/Release
     rm -rf ../collisionAI/build/win32/ReleaseAVX
@@ -248,10 +246,10 @@ if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI" ]]; then
 fi
 
 if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "sfAI_Rut29" ]]; then
-echo "Cleaning Social Forces"
-pushd ../socialForcesAI/build > /dev/null
-$MAKE clean > /dev/null
-popd > /dev/null
+    echo "Cleaning sfAI_Rut29"
+    pushd ../sfAI_Rut29/build > /dev/null
+    $MAKE clean > /dev/null
+    popd > /dev/null
 fi
 
 if [[ $BUILD_MODULE == "all" || $BUILD_MODULE == "collisionAI" ]]; then
