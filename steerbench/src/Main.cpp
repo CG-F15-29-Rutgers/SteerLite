@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
 
 		if (!printNumericalScoreOnly) {
-			std::cout << "Benchmark technique: " << benchmarkTechniqueName << "\n" << "WOWOWOWOW!"<< endl;
+			std::cout << "Benchmark technique: " << benchmarkTechniqueName << endl;
 		}
 
 		for (unsigned int i=0; i<recFilesToBenchmark.size(); i++) {
