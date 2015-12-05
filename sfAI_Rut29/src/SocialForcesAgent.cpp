@@ -107,6 +107,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 		this->_color = initialConditions.color;
 	else
 		this->_color = Util::gBlue;
+    obstacleClearance = 0;
 
 	// compute the "new" bounding box of the agent
 	Util::AxisAlignedBox newBounds(_position.x-_radius, _position.x+_radius, 0.0f, 0.5f, _position.z-_radius, _position.z+_radius);
@@ -133,44 +134,57 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
         if (testcase.compare(testcase.length() - ending.length(), ending.length(), ending) == 0)
             testcase.erase(testcase.length() - ending.length(), ending.length());
 
-    std::cout << "Using testcase: " << testcase << std::endl;
+    // std::cout << "Using testcase: " << testcase << std::endl;
 
     // Set testcase-specific parameters
-    if (testcase == "plane_egress") {
-        // TODO
+    if (testcase == "plane_egress")
+    {
         plane_egress=true;
         _SocialForcesParams.sf_wall_b = 0.08; //  inverse proximity force importance
         _SocialForcesParams.sf_wall_a = 25; //  proximity force importance
-    } else if (testcase == "plane_ingress") {
-        // TODO
+    }
+    else if (testcase == "plane_ingress")
+    {
         plane_ingress=true;
-    } else if (testcase == "crowd_crossing") {
-        // TODO
+    }
+    else if (testcase == "crowd_crossing")
+    {
         crowd_crossing=true;
-    } else if (testcase == "office-complex") {
-        // TODO
+    }
+    else if (testcase == "office-complex")
+    {
         office_complex=true;
-    } else if (testcase == "hallway-four-way-rounded-roundabout") {
-        // TODO
+        _SocialForcesParams.sf_wall_b = 0.08; //  inverse proximity force importance
+        _SocialForcesParams.sf_wall_a = 25; //  proximity force importance
+    }
+    else if (testcase == "hallway-four-way-rounded-roundabout")
+    {
         hallway_four_way_rounded_roundabout=true;
-    } else if (testcase == "bottleneck-squeeze") {
-        // TODO
+    }
+    else if (testcase == "bottleneck-squeeze")
+    {
         bottleneck_squeeze=true;
-    } else if (testcase == "doorway-two-way") {
-        // TODO
+    }
+    else if (testcase == "doorway-two-way")
+    {
         doorway_two_way=true;
-    } else if (testcase == "double-squeeze") {
-        // TODO
+    }
+    else if (testcase == "double-squeeze")
+    {
         double_squeeze=true;
-    } else if (testcase == "wall-squeeze") {
-        // TODO
+    }
+    else if (testcase == "wall-squeeze")
+    {
         wall_squeeze=true;
-    } else if (testcase == "hallway-two-way") {
-        // TODO
+    }
+    else if (testcase == "hallway-two-way")
+    {
         hallway_two_way=true;
-    } else if (testcase == "maze") {
-        // TODO
+    }
+    else if (testcase == "maze")
+    {
         maze=true;
+        obstacleClearance = 2;
     }
 
 	_enabled = true;
@@ -819,7 +833,7 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
 
     AStarPlanner Astarpath; //ASTAR.
 
-    if (!Astarpath.computePath(agentPath, pos, _goalQueue.front().targetLocation, gSpatialDatabase, false, 1, true)) {
+    if (!Astarpath.computePath(agentPath, pos, _goalQueue.front().targetLocation, gSpatialDatabase, false, 1, false, obstacleClearance)) {
         std::cout << "A* computePath failed" << std::endl;
         return false;
     }

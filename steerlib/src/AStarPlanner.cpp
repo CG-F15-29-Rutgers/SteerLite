@@ -16,7 +16,6 @@
 
 #define COLLISION_COST  1000
 #define GRID_STEP  1
-#define OBSTACLE_CLEARANCE 0
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
 
@@ -26,7 +25,7 @@ namespace SteerLib
 
 	AStarPlanner::~AStarPlanner(){}
 
-	bool AStarPlanner::canBeTraversed ( int id )
+	bool AStarPlanner::canBeTraversed ( int id, int obstacleClearance )
 	{
 		double traversal_cost = 0;
 		int current_id = id;
@@ -34,11 +33,11 @@ namespace SteerLib
 		gSpatialDatabase->getGridCoordinatesFromIndex(current_id, x, z);
 		int x_range_min, x_range_max, z_range_min, z_range_max;
 
-		x_range_min = (x < OBSTACLE_CLEARANCE) ? 0 : (x - OBSTACLE_CLEARANCE);
-		x_range_max = MIN(x+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsX() - 1);
+		x_range_min = (x < obstacleClearance) ? 0 : (x - obstacleClearance);
+		x_range_max = MIN(x+obstacleClearance, gSpatialDatabase->getNumCellsX() - 1);
 
-		z_range_min = (z < OBSTACLE_CLEARANCE) ? 0 : (z - OBSTACLE_CLEARANCE);
-		z_range_max = MIN(z+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsZ() - 1);
+		z_range_min = (z < obstacleClearance) ? 0 : (z - obstacleClearance);
+		z_range_max = MIN(z+obstacleClearance, gSpatialDatabase->getNumCellsZ() - 1);
 
 		for (int i = x_range_min; i<=x_range_max; i+=GRID_STEP)
 		{
@@ -61,7 +60,7 @@ namespace SteerLib
 		return p;
 	}
 
-    std::vector<Util::Point> AStarPlanner::getSuccessors(const Util::Point& p)
+    std::vector<Util::Point> AStarPlanner::getSuccessors(const Util::Point& p, bool diagonal, int obstacleClearance)
     {
         int startIndex = gSpatialDatabase->getCellIndexFromLocation(p);
         unsigned int x, z;
@@ -77,9 +76,11 @@ namespace SteerLib
 
         for (int i = minx; i <= maxx; i++) {
             for (int j = minz; j <= maxz; j++) {
+                if (!diagonal && i != x && j != z)
+                    continue;
                 if (!(i == x && j == z)) {
                     int index = gSpatialDatabase->getCellIndexFromGridCoords(i, j);
-                    if (canBeTraversed(index)) {
+                    if (canBeTraversed(index, obstacleClearance)) {
                         Util::Point p;
                         gSpatialDatabase->getLocationFromIndex(index, p);
                         successors.push_back(p);
@@ -87,33 +88,6 @@ namespace SteerLib
                 }
             }
         }
-        return successors;
-    }
-
-    std::vector<Util::Point> AStarPlanner::get_partial_Successors(const Util::Point& p) //add for not consindering diagonal
-    {
-        int minx = MAX(gSpatialDatabase->getOriginX(), p.x - 1);
-        int maxx = MIN(p.x + 1, gSpatialDatabase->getNumCellsX() + gSpatialDatabase->getOriginX());
-
-        int minz = MAX(gSpatialDatabase->getOriginZ(), p.z - 1);
-        int maxz = MIN(p.z + 1, gSpatialDatabase->getNumCellsZ() + gSpatialDatabase->getOriginZ());
-
-        std::vector<Util::Point> successors;
-
-        int index1 = (gSpatialDatabase->getCellIndexFromLocation(minx,p.z));
-        int index2 = (gSpatialDatabase->getCellIndexFromLocation(p.x,maxz));
-        int index3 = (gSpatialDatabase->getCellIndexFromLocation(maxx,p.z));
-        int index4 = (gSpatialDatabase->getCellIndexFromLocation(p.x,minz));
-
-        if (canBeTraversed(index1))
-            successors.push_back(Util::Point(minx,0,p.z));
-        if (canBeTraversed(index2))
-            successors.push_back(Util::Point(p.x,0,maxz));
-        if (canBeTraversed(index3))
-            successors.push_back(Util::Point(maxx,0,p.z));
-        if (canBeTraversed(index4))
-            successors.push_back(Util::Point(p.x,0,minz));
-
         return successors;
     }
 
@@ -219,7 +193,7 @@ namespace SteerLib
      * agent_path if successful (replacing existing values unless
      * append_to_path is true). Otherwise returns false.
      */
-	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path, float weight,bool diagonal)
+	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path, float weight, bool diagonal, int obstacleClearance)
 	{
 		gSpatialDatabase = _gSpatialDatabase;
 
@@ -240,7 +214,7 @@ namespace SteerLib
             int curr_grid_index = _gSpatialDatabase->getCellIndexFromLocation(openset[curr_index].point);
 
             if (goal_grid_index == curr_grid_index) {
-                std::cout << "Found path" << std::endl;
+                // std::cout << "Found path" << std::endl;
                 foundPath = true;
                 break;
             }
@@ -250,11 +224,7 @@ namespace SteerLib
             openset.erase(openset.begin() + curr_index);
 
             AStarPlannerNode& current = closedset.back();
-            std::vector<Util::Point> successors;
-            if (!diagonal)
-                successors = get_partial_Successors(current.point);
-            else
-                successors = getSuccessors(current.point);
+            std::vector<Util::Point> successors = getSuccessors(current.point, diagonal, obstacleClearance);
 
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {

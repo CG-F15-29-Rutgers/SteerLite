@@ -83,7 +83,7 @@ namespace SteerLib
              * [Z_GRID-OBSTACLE_CLEARANCE, Z_GRID+OBSTACLE_CLEARANCE]]
              * This function also contains the griddatabase call that gets traversal costs.
              */
-			bool canBeTraversed ( int id );
+			bool canBeTraversed ( int id, int obstacleClearance );
 
 			/**
              * @function getPointFromGridIndex accepts the grid index as input and returns an Util::Point corresponding to the center of that cell.
@@ -104,13 +104,12 @@ namespace SteerLib
              * append_to_path    : An optional argument to append to agent_path instead of overwriting it.
              */
 
-			bool computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path = false, float weight=1, bool diagonal=true);
+			bool computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path = false, float weight=1, bool diagonal=true, int obstacleClearance = 0);
 
         private:
 			SteerLib::GridDatabase2D* gSpatialDatabase;
 
-            std::vector<Util::Point> getSuccessors(const Util::Point& p);
-            std::vector<Util::Point> get_partial_Successors(const Util::Point& p);
+            std::vector<Util::Point> getSuccessors(const Util::Point& p, bool diagonal, int obstacleClearance);
 	};
 
 

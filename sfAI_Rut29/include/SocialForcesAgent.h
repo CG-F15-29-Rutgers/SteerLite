@@ -87,6 +87,8 @@ class SocialForcesAgent : public SteerLib::AgentInterface
     bool hallway_two_way;
     bool maze;
 
+    int obstacleClearance;
+
         /**
              * \brief   Updates the three-dimensional position and three-dimensional velocity of this agent.
              */
