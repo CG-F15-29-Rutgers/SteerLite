@@ -182,13 +182,13 @@ namespace SteerLib
      * agent_path if successful (replacing existing values unless
      * append_to_path is true). Otherwise returns false.
      */
-	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path)
+	bool AStarPlanner::computePath(std::vector<Util::Point>& agent_path, Util::Point start, Util::Point goal, SteerLib::GridDatabase2D* _gSpatialDatabase, bool append_to_path, float weight,bool diagonal)
 	{
 		gSpatialDatabase = _gSpatialDatabase;
 
         bool foundPath = false;
 
-        float weight = 1; // for weighted A*
+        //float weight = 1; // for weighted A*
 
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
