@@ -212,8 +212,10 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 		}
 	}
 
-	//runLongTermPlanning(); diana.
-    runASTARplanning(); //working with A* path finder.
+    if (plane_egress || plane_ingress || office_complex || maze)
+        runASTARplanning(); //working with A* path finder.
+	else
+        runLongTermPlanning();
 
 	// std::cout << "first waypoint: " << _waypoints.front() << " agents position: " << position() << std::endl;
 	/*
