@@ -817,13 +817,15 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
 
     AStarPlanner Astarpath; //ASTAR.
 
-    if (!Astarpath.computePath(agentPath,pos, _goalQueue.front().targetLocation,gSpatialDatabase, false,1,true))
+    if (!Astarpath.computePath(agentPath, pos, _goalQueue.front().targetLocation, gSpatialDatabase, false, 1, true)) {
+        std::cout << "A* computePath failed" << std::endl;
         return false;
+    }
 
     // Push path into _waypoints
 
     // Skip first node that is at location of agent
-    for  (int i=1; i < agentPath.size(); i++)
+    for (int i=1; i < agentPath.size(); i++)
     {
         _midTermPath.push_back(agentPath.at(i));
         if ((i % FURTHEST_LOCAL_TARGET_DISTANCE) == 0)
