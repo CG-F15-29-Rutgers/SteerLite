@@ -42,6 +42,20 @@ SocialForcesAgent::SocialForcesAgent()
 	_SocialForcesParams.sf_max_speed = sf_max_speed;
 
 	_enabled = false;
+    
+    /* crowd_simulation flags*/
+    plane_egress = false;
+    plane_ingress = false;
+    crowd_crossing = false;
+    office_complex = false;
+    hallway_four_way_rounded_roundabout=false;
+    bottleneck_squeeze=false;
+    doorway_two_way=false;
+    double_squeeze=false;
+    wall_squeeze=false;
+   hallway_two_way=false;
+   maze=false;
+
 }
 
 SocialForcesAgent::~SocialForcesAgent()
@@ -124,26 +138,37 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     // Set testcase-specific parameters
     if (testcase == "plane_egress") {
         // TODO
+        plane_egress=true;
     } else if (testcase == "plane_ingress") {
         // TODO
+        plane_ingress=true;
     } else if (testcase == "crowd_crossing") {
         // TODO
+        crowd_crossing=true;
     } else if (testcase == "office-complex") {
         // TODO
+        office_complex=true;
     } else if (testcase == "hallway-four-way-rounded-roundabout") {
         // TODO
+        hallway_four_way_rounded_roundabout=true;
     } else if (testcase == "bottleneck-squeeze") {
         // TODO
+        bottleneck_squeeze=true;
     } else if (testcase == "doorway-two-way") {
         // TODO
+        doorway_two_way=true;
     } else if (testcase == "double-squeeze") {
         // TODO
+        double_squeeze=true;
     } else if (testcase == "wall-squeeze") {
         // TODO
+        wall_squeeze=true;
     } else if (testcase == "hallway-two-way") {
         // TODO
+        hallway_two_way=true;
     } else if (testcase == "maze") {
         // TODO
+        maze=true;
     }
 
 	_enabled = true;

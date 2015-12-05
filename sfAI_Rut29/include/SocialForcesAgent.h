@@ -73,6 +73,19 @@ class SocialForcesAgent : public SteerLib::AgentInterface
         // void _doEulerStep(const Util::Vector & steeringDecisionForce, float dt);
 
         SocialForcesParameters _SocialForcesParams;
+    
+    /* crowd_simulation flags*/
+    bool plane_egress;
+    bool plane_ingress;
+    bool crowd_crossing;
+    bool office_complex;
+    bool hallway_four_way_rounded_roundabout;
+    bool bottleneck_squeeze;
+    bool doorway_two_way;
+    bool double_squeeze;
+    bool wall_squeeze;
+    bool hallway_two_way;
+    bool maze;
 
         /**
              * \brief   Updates the three-dimensional position and three-dimensional velocity of this agent.
