@@ -225,8 +225,6 @@ namespace SteerLib
 
         bool foundPath = false;
 
-        //float weight = 1; // for weighted A*
-
         std::vector<AStarPlannerNode> openset;
         std::vector<AStarPlannerNode> closedset;
 
@@ -260,7 +258,7 @@ namespace SteerLib
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {
                 int closed_index = findNode(closedset, successors[i], _gSpatialDatabase);
-                if (closed_index != -1) { // not in the closed set
+                if (closed_index != -1) { // in the closed set
                     continue;
                 }
 
