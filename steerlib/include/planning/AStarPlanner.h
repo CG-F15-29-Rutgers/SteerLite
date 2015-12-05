@@ -110,6 +110,7 @@ namespace SteerLib
 			SteerLib::GridDatabase2D* gSpatialDatabase;
 
             std::vector<Util::Point> getSuccessors(const Util::Point& p);
+            std::vector<Util::Point> get_partial_Successors(const Util::Point& p);
 	};
 
 

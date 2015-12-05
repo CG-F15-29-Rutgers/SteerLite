@@ -16,7 +16,7 @@
 
 #define COLLISION_COST  1000
 #define GRID_STEP  1
-#define OBSTACLE_CLEARANCE 1
+#define OBSTACLE_CLEARANCE 20//1
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
 
@@ -60,17 +60,30 @@ namespace SteerLib
 		gSpatialDatabase->getLocationFromIndex(id, p);
 		return p;
 	}
+/*
+    bool AStarPlanner::canBeTraversed ( int id )
+    {
+        float traversal_cost=0;
+        
+    
+        traversal_cost = gSpatialDatabase->getTraversalCost ( id );
+        if(traversal_cost>0)
+            return false;
+        else
+            return true;
 
+    }*/
+    
     std::vector<Util::Point> AStarPlanner::getSuccessors(const Util::Point& p)
     {
         int minx = MAX(gSpatialDatabase->getOriginX(), p.x - 1);
         int maxx = MIN(p.x + 1, gSpatialDatabase->getNumCellsX() + gSpatialDatabase->getOriginX());
-
+        
         int minz = MAX(gSpatialDatabase->getOriginZ(), p.z - 1);
         int maxz = MIN(p.z + 1, gSpatialDatabase->getNumCellsZ() + gSpatialDatabase->getOriginZ());
-
+        
         std::vector<Util::Point> successors;
-
+        
         for (int i = minx; i <= maxx; i++) {
             for (int j = minz; j <= maxz; j++) {
                 if (!(i == p.x && j == p.z)) {
@@ -80,6 +93,34 @@ namespace SteerLib
                 }
             }
         }
+        return successors;
+    }
+
+    std::vector<Util::Point> AStarPlanner::get_partial_Successors(const Util::Point& p) //add for not consindering diagonal
+    {
+        int minx = MAX(gSpatialDatabase->getOriginX(), p.x - 1);
+        int maxx = MIN(p.x + 1, gSpatialDatabase->getNumCellsX() + gSpatialDatabase->getOriginX());
+
+        int minz = MAX(gSpatialDatabase->getOriginZ(), p.z - 1);
+        int maxz = MIN(p.z + 1, gSpatialDatabase->getNumCellsZ() + gSpatialDatabase->getOriginZ());
+
+        std::vector<Util::Point> successors;
+        
+        
+        int index1 = (gSpatialDatabase->getCellIndexFromLocation(minx,p.z));
+        int index2 = (gSpatialDatabase->getCellIndexFromLocation(p.x,maxz));
+        int index3 = (gSpatialDatabase->getCellIndexFromLocation(maxx,p.z));
+        int index4 = (gSpatialDatabase->getCellIndexFromLocation(p.x,minz));
+        
+        if (canBeTraversed(index1))
+            successors.push_back(Util::Point(minx,0,p.z));
+        if (canBeTraversed(index2))
+            successors.push_back(Util::Point(p.x,0,maxz));
+        if (canBeTraversed(index3))
+            successors.push_back(Util::Point(maxx,0,p.z));
+        if (canBeTraversed(index4))
+            successors.push_back(Util::Point(p.x,0,minz));
+
         return successors;
     }
 
@@ -211,13 +252,22 @@ namespace SteerLib
             openset.erase(openset.begin() + curr_index);
 
             AStarPlannerNode& current = closedset.back();
-
-            std::vector<Util::Point> successors = getSuccessors(current.point);
+            std::vector<Util::Point> successors;
+            if(!diagonal)
+           successors = get_partial_Successors(current.point);
+            else
+              successors = getSuccessors(current.point);
+                
+                
+                
+                
+                
+        
 
             // add successors to open list
             for (int i = 0; i < successors.size(); ++i) {
                 int closed_index = findNode(closedset, successors[i]);
-                if (closed_index != -1) {
+                if (closed_index != -1) { //in the closed set.
                     continue;
                 }
 

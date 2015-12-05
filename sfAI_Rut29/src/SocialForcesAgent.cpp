@@ -694,6 +694,7 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
 	}
 
 	Util::Vector acceleration = (prefForce + repulsionForce + proximityForce+frictionForce) / AGENT_MASS;
+   
 	_velocity = velocity() + acceleration * dt;
 	_velocity = clamp(velocity(), _SocialForcesParams.sf_max_speed);
 	_velocity.y=0.0f;
@@ -816,7 +817,7 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
 
     AStarPlanner Astarpath; //ASTAR.
 
-    if (!Astarpath.computePath(agentPath,pos, _goalQueue.front().targetLocation,gSpatialDatabase, false))
+    if (!Astarpath.computePath(agentPath,pos, _goalQueue.front().targetLocation,gSpatialDatabase, false,1,true))
         return false;
 
     // Push path into _waypoints
