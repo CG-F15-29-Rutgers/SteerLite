@@ -36,11 +36,11 @@ namespace SteerLib
 		gSpatialDatabase->getGridCoordinatesFromIndex(current_id, x, z);
 		int x_range_min, x_range_max, z_range_min, z_range_max;
 
-		x_range_min = MAX(x-OBSTACLE_CLEARANCE, 0);
-		x_range_max = MIN(x+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsX());
+		x_range_min = (x < OBSTACLE_CLEARANCE) ? 0 : (x - OBSTACLE_CLEARANCE);
+		x_range_max = MIN(x+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsX() - 1);
 
-		z_range_min = MAX(z-OBSTACLE_CLEARANCE, 0);
-		z_range_max = MIN(z+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsZ());
+		z_range_min = (z < OBSTACLE_CLEARANCE) ? 0 : (z - OBSTACLE_CLEARANCE);
+		z_range_max = MIN(z+OBSTACLE_CLEARANCE, gSpatialDatabase->getNumCellsZ() - 1);
 
 
 		for (int i = x_range_min; i<=x_range_max; i+=GRID_STEP)
