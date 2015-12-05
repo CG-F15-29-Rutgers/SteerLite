@@ -299,12 +299,12 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
         //   force += A * exp((r - d) / B) * away;
     }
 
-    return force;
+    return force*dt;
 }
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
-    return AGENT_MASS * (PREFERED_SPEED * _goalDirection - velocity()) / _dt;
+    return AGENT_MASS * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for 
 }
 
 Util::Vector SocialForcesAgent::calcRepulsionForce(float dt)
@@ -364,7 +364,7 @@ Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
         }
     }
 
-    return force;
+    return force*dt;
 }
 
 
@@ -408,7 +408,7 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
             continue;
     }
 
-    return force;
+    return force*dt;
 }
 
 Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
@@ -444,7 +444,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
         }//obstacle;
     }
 
-    return force;
+    return force*dt;
 }
 
 std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal)
@@ -493,10 +493,12 @@ std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(
 Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 {
 	Util::AxisAlignedBox box = obs->getBounds();
+    Util::Vector temp(0,0,0);
 	if ( position().x > box.xmax )
 	{
 		if ( position().z > box.zmax)
 		{
+            /*
 			if ( abs(position().z - box.zmax ) >
 				abs( position().x - box.xmax) )
 			{
@@ -506,10 +508,18 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 			{
 				return Util::Vector(1, 0, 0);
 			}
+             */
+            
+            //obj-wall corner.
+            
+           
+            temp=position()-Util::Point(box.xmax,0,box.zmax);
+            return temp;
 
 		}
 		else if ( position().z < box.zmin )
 		{
+            /* corner handling.
 			if ( abs(position().z - box.zmin ) >
 				abs( position().x - box.xmax) )
 			{
@@ -519,6 +529,11 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 			{
 				return Util::Vector(1, 0, 0);
 			}
+            */
+            
+            temp=position()-Util::Point(box.xmax,0,box.zmin);
+            return temp;
+            
 
 		}
 		else
@@ -531,6 +546,7 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 	{
 		if ( position().z > box.zmax )
 		{
+            /*
 			if ( abs(position().z - box.zmax ) >
 				abs( position().x - box.xmin) )
 			{
@@ -540,10 +556,15 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 			{
 				return Util::Vector(-1, 0, 0);
 			}
+             */
+           
+            temp=position()-Util::Point(box.xmin,0,box.zmax);
+            return temp;
 
 		}
 		else if ( position().z < box.zmin )
 		{
+            /*
 			if ( abs(position().z - box.zmin ) >
 				abs( position().x - box.xmin) )
 			{
@@ -553,6 +574,11 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 			{
 				return Util::Vector(-1, 0, 0);
 			}
+             */
+            
+           
+            temp=position()-Util::Point(box.xmin,0,box.zmin);
+            return temp;
 
 		}
 		else
