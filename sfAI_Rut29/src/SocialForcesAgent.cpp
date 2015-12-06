@@ -160,7 +160,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
         //_SocialForcesParams.sf_agent_b = 1; //  inverse proximity force importance
         //_SocialForcesParams.sf_agent_a = 40; //  proximity force importance
         // _SocialForcesParams.sf_agent_repulsion_importance = 0.03;
-        _SocialForcesParams.sf_sliding_friction_force = 400;
+        _SocialForcesParams.sf_sliding_friction_force = 300;
     }
     else if (testcase == "office-complex")
     {
@@ -340,7 +340,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
     if (_radius == 1)
-        return 2 * mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
+        return 3 * mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
     else
         return mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
 }
