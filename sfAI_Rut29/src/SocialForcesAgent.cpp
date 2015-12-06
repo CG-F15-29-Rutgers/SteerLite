@@ -151,6 +151,12 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     else if (testcase == "crowd_crossing")
     {
         crowd_crossing=true;
+        // _SocialForcesParams.sf_wall_b = 1.6; //  inverse proximity force importance
+        // _SocialForcesParams.sf_wall_a = 80; //  proximity force importance
+        _SocialForcesParams.sf_agent_b = 0.4; //  inverse proximity force importance
+        _SocialForcesParams.sf_agent_a = 20; //  proximity force importance
+        // _SocialForcesParams.sf_agent_repulsion_importance = 0.03;
+        _SocialForcesParams.sf_sliding_friction_force = 400;
     }
     else if (testcase == "office-complex")
     {
@@ -165,6 +171,9 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     else if (testcase == "bottleneck-squeeze")
     {
         bottleneck_squeeze=true;
+        _SocialForcesParams.sf_agent_body_force = 4000;
+        _SocialForcesParams.sf_agent_a = 0.8;
+        _SocialForcesParams.sf_agent_b = 40;
     }
     else if (testcase == "doorway-two-way")
     {
