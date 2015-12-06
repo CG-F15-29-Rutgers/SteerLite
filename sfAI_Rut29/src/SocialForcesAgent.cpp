@@ -310,6 +310,9 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
             r = _radius + agent->radius(); //ri+rj
             d = (_position - agent->position()).length();//ok.
             force += A_agent * exp((r - d) / B_agent) * away;
+
+            if (agent->radius() == 1)
+                force *= 3;
         } else {//obstacle.
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
             Vector wall_normal = calcWallNormal(obs); //niw
@@ -332,7 +335,10 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
-    return mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for 
+    if (_radius == 1)
+        return 10 * mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
+    else
+        return mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
 }
 
 Util::Vector SocialForcesAgent::calcRepulsionForce(float dt)
@@ -432,6 +438,9 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
                 force += k * (r-d) * away;
             else
                 force += Vector (0,0,0);
+
+            if (agent->radius() == 1)
+                force *= 3;
         } else
             continue;
     }
