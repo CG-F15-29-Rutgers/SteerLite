@@ -147,14 +147,18 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     else if (testcase == "plane_ingress")
     {
         plane_ingress=true;
+       // _SocialForcesParams.sf_body_force = 2000;
+        _SocialForcesParams.sf_wall_b = 0.5;
+        _SocialForcesParams.sf_wall_a = 50;
     }
     else if (testcase == "crowd_crossing")
     {
         crowd_crossing=true;
-        // _SocialForcesParams.sf_wall_b = 1.6; //  inverse proximity force importance
-        // _SocialForcesParams.sf_wall_a = 80; //  proximity force importance
-        _SocialForcesParams.sf_agent_b = 0.4; //  inverse proximity force importance
-        _SocialForcesParams.sf_agent_a = 20; //  proximity force importance
+        //_SocialForcesParams.sf_body_force = 4000;
+         _SocialForcesParams.sf_wall_b = 1.6; //  inverse proximity force importance
+         _SocialForcesParams.sf_wall_a = 80; //  proximity force importance
+        //_SocialForcesParams.sf_agent_b = 1; //  inverse proximity force importance
+        //_SocialForcesParams.sf_agent_a = 40; //  proximity force importance
         // _SocialForcesParams.sf_agent_repulsion_importance = 0.03;
         _SocialForcesParams.sf_sliding_friction_force = 400;
     }
@@ -330,13 +334,13 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
         //   force += A * exp((r - d) / B) * away;
     }
 
-    return force;
+    return force*dt;
 }
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
     if (_radius == 1)
-        return 10 * mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
+        return 2 * mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
     else
         return mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
 }
@@ -398,7 +402,7 @@ Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
         }
     }
 
-    return force;
+    return force*dt;
 }
 
 
@@ -445,7 +449,7 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
             continue;
     }
 
-    return force;
+    return force*dt;
 }
 
 Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
@@ -481,7 +485,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
         }//obstacle;
     }
 
-    return force;
+    return force*dt;
 }
 
 std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal)
