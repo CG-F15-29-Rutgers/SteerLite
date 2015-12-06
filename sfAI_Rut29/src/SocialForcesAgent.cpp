@@ -56,6 +56,7 @@ SocialForcesAgent::SocialForcesAgent()
    hallway_two_way=false;
    maze=false;
 
+   mass = AGENT_MASS;
 }
 
 SocialForcesAgent::~SocialForcesAgent()
@@ -233,7 +234,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 		goalDirection = normalize( _goalQueue.front().targetLocation - position());
 	}
 
-	_prefVelocity = (((Util::Vector(goalDirection.x, 0.0f, goalDirection.z) * PREFERED_SPEED) - velocity()) / _SocialForcesParams.sf_acceleration) * MASS;
+	_prefVelocity = (((Util::Vector(goalDirection.x, 0.0f, goalDirection.z) * PREFERED_SPEED) - velocity()) / _SocialForcesParams.sf_acceleration) * mass;
 
 	// _velocity = _prefVelocity;
 #ifdef _DEBUG_ENTROPY
@@ -322,7 +323,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
-    return AGENT_MASS * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for 
+    return mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for 
 }
 
 Util::Vector SocialForcesAgent::calcRepulsionForce(float dt)
@@ -711,8 +712,8 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
 		alpha=0;
 	}
 
-	Util::Vector acceleration = (prefForce + repulsionForce + proximityForce+frictionForce) / AGENT_MASS;
-   
+	Util::Vector acceleration = (prefForce + repulsionForce + proximityForce+frictionForce) / mass;
+
 	_velocity = velocity() + acceleration * dt;
 	_velocity = clamp(velocity(), _SocialForcesParams.sf_max_speed);
 	_velocity.y=0.0f;
