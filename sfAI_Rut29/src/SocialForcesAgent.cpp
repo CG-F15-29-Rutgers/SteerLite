@@ -226,7 +226,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 		}
 	}
 
-    if (plane_egress || plane_ingress || office_complex || bottleneck_squeeze || maze)
+    if (plane_egress || plane_ingress || office_complex || bottleneck_squeeze || doorway_two_way || maze)
         runASTARplanning(); //working with A* path finder.
 	else
         runLongTermPlanning();
