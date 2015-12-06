@@ -340,9 +340,9 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
     if (_radius == 1)
-        return 3 * mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
+        return 3 * mass * (PREFERED_SPEED * _goalDirection - velocity()) / _dt; //diana. for
     else
-        return mass * (PREFERED_SPEED * _goalDirection - velocity()); /// _dt; //diana. for
+        return mass * (PREFERED_SPEED * _goalDirection - velocity()) / _dt; //diana. for
 }
 
 Util::Vector SocialForcesAgent::calcRepulsionForce(float dt)
