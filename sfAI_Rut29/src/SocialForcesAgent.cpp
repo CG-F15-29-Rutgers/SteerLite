@@ -318,7 +318,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
         //   force += A * exp((r - d) / B) * away;
     }
 
-    return force*dt;
+    return force;
 }
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
@@ -383,7 +383,7 @@ Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
         }
     }
 
-    return force*dt;
+    return force;
 }
 
 
@@ -427,7 +427,7 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
             continue;
     }
 
-    return force*dt;
+    return force;
 }
 
 Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
@@ -463,7 +463,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
         }//obstacle;
     }
 
-    return force*dt;
+    return force;
 }
 
 std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal)
