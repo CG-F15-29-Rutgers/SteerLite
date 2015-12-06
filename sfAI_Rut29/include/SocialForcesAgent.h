@@ -86,6 +86,7 @@ class SocialForcesAgent : public SteerLib::AgentInterface
         bool wall_squeeze;
         bool hallway_two_way;
         bool maze;
+        bool choreography_rut29;
 
         int obstacleClearance;
         int mass;

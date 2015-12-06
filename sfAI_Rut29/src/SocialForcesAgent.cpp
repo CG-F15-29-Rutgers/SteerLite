@@ -55,6 +55,8 @@ SocialForcesAgent::SocialForcesAgent()
     wall_squeeze=false;
    hallway_two_way=false;
    maze=false;
+    choreography_rut29=false;
+    
 
    mass = AGENT_MASS;
 }
@@ -200,6 +202,11 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
         maze=true;
         obstacleClearance = 2;
     }
+    else if (testcase == "Choreography_Rut29")
+    {
+        choreography_rut29=true;
+    }
+        
 
 	_enabled = true;
 
