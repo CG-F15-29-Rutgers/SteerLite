@@ -196,9 +196,16 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         double_squeeze=true;
     }
-    else if (testcase == "wall-squeeze")
+    else if (testcase == "wall-squeeze") //looks good.
     {
         wall_squeeze=true;
+        
+        _SocialForcesParams.sf_wall_b = 0.6; //  inverse proximity force importance
+        _SocialForcesParams.sf_wall_a = 30;
+        _SocialForcesParams.sf_agent_a = 50;
+        _SocialForcesParams.sf_agent_b = 0.9;
+
+        
     }
     else if (testcase == "hallway-two-way")
     {
@@ -398,7 +405,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
             r = _radius + agent->radius(); //ri+rj
             d = (_position - agent->position()).length();//ok.
             force += A_agent * exp((r - d) / B_agent) * away;
-            if(choreography_rut29 && agent->radius()==1)
+            if((choreography_rut29 && agent->radius()==1)||(wall_squeeze&&agent->position().x<0))
                 force*=3;
             
         } else {//obstacle.
