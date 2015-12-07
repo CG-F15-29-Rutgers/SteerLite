@@ -147,8 +147,11 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     if (testcase == "plane_egress")
     {
         plane_egress=true;
-        _SocialForcesParams.sf_wall_b = 0.08; //  inverse proximity force importance
-        _SocialForcesParams.sf_wall_a = 25; //  proximity force importance
+        //this value has 3000 do not remove..
+         _SocialForcesParams.sf_wall_a = 40; //  inverse proximity force importance
+        _SocialForcesParams.sf_wall_b = 0.5; //  proximity force importance
+      //  _SocialForcesParams.sf_agent_a = 50; //  inverse proximity force importance
+       // _SocialForcesParams.sf_agent_b = 1;
     }
     else if (testcase == "plane_ingress")
     {
