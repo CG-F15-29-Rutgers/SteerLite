@@ -88,6 +88,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 	// compute the "old" bounding box of the agent before it is reset.  its OK that it will be invalid if the agent was previously disabled
 	// because the value is not used in that case.
 	// std::cout << "resetting agent " << this << std::endl;
+    
+    
 	_waypoints.clear();
 	_midTermPath.clear();
 
@@ -137,8 +139,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
         if (testcase.compare(testcase.length() - ending.length(), ending.length(), ending) == 0)
             testcase.erase(testcase.length() - ending.length(), ending.length());
 
-    // std::cout << "Using testcase: " << testcase << std::endl;
-
+     //std::cout << "Using testcase: " << testcase << std::endl;
+    
     // Set testcase-specific parameters
     if (testcase == "plane_egress")
     {
@@ -201,12 +203,64 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         maze=true;
         obstacleClearance = 2;
+       // std::cout << "Are you comming here?" << std::endl;
+
     }
-    else if (testcase == "Choreography_Rut29")
+    else if (testcase == "choreography_rut29")
     {
-        choreography_rut29=true;
-    }
         
+        choreography_rut29=true;
+       //   std::cout << "Are you comming here?" << std::endl;
+
+    }
+    
+    
+    if (choreography_rut29 && _radius==1)
+    {
+        
+        _enabled = true;
+        
+        if (initialConditions.goals.size() == 0) {
+            throw Util::GenericException("No goals were specified!\n");
+        }
+        
+        // iterate over the sequence of goals specified by the initial conditions.
+        for (unsigned int i=0; i<initialConditions.goals.size(); i++) {
+            if (initialConditions.goals[i].goalType == SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET) {
+                _goalQueue.push(initialConditions.goals[i]);
+                if (initialConditions.goals[i].targetIsRandom) {
+                    // if the goal is random, we must randomly generate the goal.
+                    _goalQueue.back().targetLocation = gSpatialDatabase->randomPositionWithoutCollisions(1.0f, true);
+                }
+            }
+            else {
+                throw Util::GenericException("Unsupported goal type; CurveAgent only supports GOAL_TYPE_SEEK_STATIC_TARGET.");
+            }
+        }
+        
+        // Add control points to curve
+        std::vector<Util::CurvePoint> controlPoints;
+        Util::Vector startTangent(0.f, 0.f, 0.f);
+        controlPoints.push_back(Util::CurvePoint(_position, startTangent, 0.f));
+        for (int i = 0; i < _goalQueue.size(); i++)
+        {
+        
+            controlPoints.push_back(Util::CurvePoint(_goalQueue.front().targetLocation, _goalQueue.front().targetTangent, _goalQueue.front().targetTime));
+            _goalQueue.pop();
+        }
+        
+        Curve curve;
+      
+        
+        curve.addControlPoints(controlPoints);
+        
+        assert(_forward.length()!=0.0f);
+        assert(_goalQueue.size() != 0);
+        assert(_radius != 0.0f);
+
+        
+    }
+    else{
 
 	_enabled = true;
 
@@ -232,9 +286,14 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 			throw Util::GenericException("Unsupported goal type; SocialForcesAgent only supports GOAL_TYPE_SEEK_STATIC_TARGET and GOAL_TYPE_AXIS_ALIGNED_BOX_GOAL.");
 		}
 	}
+    
+    
 
     if (plane_egress || plane_ingress || office_complex || bottleneck_squeeze || doorway_two_way || maze)
         runASTARplanning(); //working with A* path finder.
+    else if (choreography_rut29)
+        runRandomplanning();
+
 	else
         runLongTermPlanning();
 
@@ -267,6 +326,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 	assert(_forward.length()!=0.0f);
 	assert(_goalQueue.size() != 0);
 	assert(_radius != 0.0f);
+    }
+
 }
 
 std::pair<float, Util::Point> minimum_distance(Util::Point l1, Util::Point l2, Util::Point p)
@@ -885,6 +946,48 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
     return true;
 }
 
+bool SocialForcesAgent::runRandomplanning()
+{
+    
+    _midTermPath.clear();
+    // _waypoints.clear(); //midterm path clear?
+    //==========================================================================
+    
+    // run the main a-star search here
+      std::cout << "Are you comming here?" << std::endl;
+    std::vector<Util::Point> agentPath;
+    Util::Point pos = position(); //start_position. //foat
+    
+    agentPath.push_back(pos); //start
+    int number_of_path = 10;
+    
+    for (int i =0;i<number_of_path;++i) // random path
+    {
+        float temp_x = rand()%180-90; //range -90~89
+        float temp_y = rand()%180-90; //range -90~89
+        
+        Util::Point temp_point(temp_x,0,temp_y);
+        
+        agentPath.push_back(temp_point);
+    }
+    
+    agentPath.push_back(_goalQueue.front().targetLocation); //last point.
+    
+    
+  
+    for (int i=1; i < agentPath.size(); i++)
+    {
+        _midTermPath.push_back(agentPath.at(i));
+        if ((i % FURTHEST_LOCAL_TARGET_DISTANCE) == 0)
+        {
+            _waypoints.push_back(agentPath.at(i));
+        }
+    }
+    
+    return true;
+
+    
+}
 /**
  * finds a path to the current goal
  * puts that path in midTermPath

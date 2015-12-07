@@ -120,7 +120,7 @@ class SocialForcesAgent : public SteerLib::AgentInterface
         std::vector<Util::Point> _waypoints;
 
     private:
-    
+    bool runRandomplanning(); //diana.
         bool runASTARplanning();//diana.
         bool runLongTermPlanning2();
         bool runLongTermPlanning();

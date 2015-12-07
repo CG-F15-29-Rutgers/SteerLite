@@ -36,6 +36,7 @@
 
 #include "planning/BestFirstSearchPlanner.h"
 #include "planning/AStarPlanner.h"
+#include "util/Curve.h"
 
 #include "simulation/Camera.h"
 #include "simulation/Clock.h"
