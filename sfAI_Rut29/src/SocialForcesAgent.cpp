@@ -185,8 +185,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         bottleneck_squeeze=true;
         _SocialForcesParams.sf_agent_body_force = 4000;
-        _SocialForcesParams.sf_agent_a = 0.8;
-        _SocialForcesParams.sf_agent_b = 40;
+        _SocialForcesParams.sf_agent_a = 50;
+        _SocialForcesParams.sf_agent_b = 0.9;
     }
     else if (testcase == "doorway-two-way")
     {
@@ -998,6 +998,9 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
 
     std::vector<Util::Point> agentPath;
     Util::Point pos = position(); //start_position.
+    int weight =1;
+    if (bottleneck_squeeze)
+        weight = 10;
 
     /*
      if (gEngine->isAgentSelected(this))
@@ -1008,7 +1011,7 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
 
     AStarPlanner Astarpath; //ASTAR.
 
-    if (!Astarpath.computePath(agentPath, pos, _goalQueue.front().targetLocation, gSpatialDatabase, false, 1, false, obstacleClearance)) {
+    if (!Astarpath.computePath(agentPath, pos, _goalQueue.front().targetLocation, gSpatialDatabase, false, weight, false, obstacleClearance)) {
         std::cout << "A* computePath failed" << std::endl;
         return false;
     }
