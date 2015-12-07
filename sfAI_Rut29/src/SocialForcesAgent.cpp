@@ -212,8 +212,13 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         
         choreography_rut29=true;
-        _SocialForcesParams.sf_wall_b = 0.08; //  inverse proximity force importance
-        _SocialForcesParams.sf_wall_a = 25;
+        _SocialForcesParams.sf_agent_body_force = 4000;
+        _SocialForcesParams.sf_wall_b = 1; //  inverse proximity force importance
+        _SocialForcesParams.sf_wall_a = 200;
+        
+        _SocialForcesParams.sf_agent_a = 2;
+        _SocialForcesParams.sf_agent_b = 300;
+
        //   std::cout << "Are you comming here?" << std::endl;
 
     }
