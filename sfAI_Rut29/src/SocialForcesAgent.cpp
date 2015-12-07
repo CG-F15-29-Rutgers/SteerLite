@@ -163,13 +163,15 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     else if (testcase == "crowd_crossing")
     {
         crowd_crossing=true;
-        //_SocialForcesParams.sf_body_force = 4000;
-         _SocialForcesParams.sf_wall_b = 1.6; //  inverse proximity force importance
-         _SocialForcesParams.sf_wall_a = 80; //  proximity force importance
+        _SocialForcesParams.sf_body_force = 3000;
+         _SocialForcesParams.sf_wall_b = 1.4; //  inverse proximity force importance
+         _SocialForcesParams.sf_wall_a = 60; //  proximity force importance
         //_SocialForcesParams.sf_agent_b = 1; //  inverse proximity force importance
         //_SocialForcesParams.sf_agent_a = 40; //  proximity force importance
         // _SocialForcesParams.sf_agent_repulsion_importance = 0.03;
-        _SocialForcesParams.sf_sliding_friction_force = 300;
+        _SocialForcesParams.sf_agent_a = 60;
+        _SocialForcesParams.sf_agent_b =0.5;
+        _SocialForcesParams.sf_sliding_friction_force = 350;//350;
     }
     else if (testcase == "office-complex")
     {
