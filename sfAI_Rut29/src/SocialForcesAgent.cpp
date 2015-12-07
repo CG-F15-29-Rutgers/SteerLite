@@ -212,6 +212,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         
         choreography_rut29=true;
+        _SocialForcesParams.sf_wall_b = 0.08; //  inverse proximity force importance
+        _SocialForcesParams.sf_wall_a = 25;
        //   std::cout << "Are you comming here?" << std::endl;
 
     }
@@ -293,8 +295,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
 
     if (plane_egress || plane_ingress || office_complex || bottleneck_squeeze || doorway_two_way || maze)
         runASTARplanning(); //working with A* path finder.
-    else if (choreography_rut29)
-        runRandomplanning();
+  /*  else if (choreography_rut29)
+        runRandomplanning();*/
 
 	else
         runLongTermPlanning();
