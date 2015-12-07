@@ -213,11 +213,11 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
         
         choreography_rut29=true;
         _SocialForcesParams.sf_agent_body_force = 4000;
-        _SocialForcesParams.sf_wall_b = 1; //  inverse proximity force importance
-        _SocialForcesParams.sf_wall_a = 200;
+        _SocialForcesParams.sf_wall_b = 200; //  inverse proximity force importance
+        _SocialForcesParams.sf_wall_a = 1;
         
-        _SocialForcesParams.sf_agent_a = 2;
-        _SocialForcesParams.sf_agent_b = 300;
+        //_SocialForcesParams.sf_agent_a = 3;
+        //_SocialForcesParams.sf_agent_b = 300;
 
        //   std::cout << "Are you comming here?" << std::endl;
 
@@ -395,6 +395,8 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
             r = _radius + agent->radius(); //ri+rj
             d = (_position - agent->position()).length();//ok.
             force += A_agent * exp((r - d) / B_agent) * away;
+            if(choreography_rut29 && agent->radius()==1)
+                force*=3;
             
         } else {//obstacle.
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
