@@ -59,12 +59,14 @@ SocialForcesAgent::SocialForcesAgent()
     
 
    mass = AGENT_MASS;
+    Curve curve;
 }
 
 SocialForcesAgent::~SocialForcesAgent()
 {
 }
 
+Curve curve;
 void SocialForcesAgent::setParameters(Behaviour behave)
 {
 	this->_SocialForcesParams.setParameters(behave);
@@ -249,7 +251,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
             _goalQueue.pop();
         }
         
-        Curve curve;
+       // Curve curve;
       
         
         curve.addControlPoints(controlPoints);
@@ -750,6 +752,32 @@ bool SocialForcesAgent::hasLineOfSightTo(Util::Point target)
 void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNumber)
 {
 	// std::cout << "_SocialForcesParams.rvo_max_speed " << _SocialForcesParams._SocialForcesParams.rvo_max_speed << std::endl;
+    
+    if (choreography_rut29&&_radius==1)
+    {
+        //For this function, we assume that all goals are of type GOAL_TYPE_SEEK_STATIC_TARGET.
+        //The error check for this was performed in reset().
+      //  Util::AutomaticFunctionProfiler profileThisFunction( &CurveAIGlobals::gPhaseProfilers->aiProfiler );
+        Util::Point newPosition;
+        
+        //Move one step on hermiteCurve
+        if (!curve.calculatePoint(newPosition, timeStamp+dt))
+        {
+            disable();
+            return;
+        }
+        
+        //Update the database with the new agent's setup
+        Util::AxisAlignedBox oldBounds(_position.x - _radius, _position.x + _radius, 0.0f, 0.0f, _position.z - _radius, _position.z + _radius);
+        Util::AxisAlignedBox newBounds(newPosition.x - _radius, newPosition.x + _radius, 0.0f, 0.0f, newPosition.z - _radius, newPosition.z + _radius);
+        gSpatialDatabase->updateObject(this, oldBounds, newBounds);
+        
+        //Update current position
+        _position = newPosition;
+    }
+
+else
+{
 	Util::AutomaticFunctionProfiler profileThisFunction( &SocialForcesGlobals::gPhaseProfilers->aiProfiler );
 	if (!enabled())
 		return;
@@ -862,6 +890,7 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
 		_forward = normalize(_velocity);
 	}
 	// _position = _position + (_velocity * dt);
+}
 }
 
 /**
