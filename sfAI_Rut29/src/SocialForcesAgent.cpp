@@ -1261,4 +1261,6 @@ void SocialForcesAgent::draw()
 	*/
 #endif
 #endif
+    if (choreography_rut29 && _radius==1)
+    curve.drawCurve( Util::gBlue);
 }
