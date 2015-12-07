@@ -53,12 +53,12 @@ SocialForcesAgent::SocialForcesAgent()
     doorway_two_way=false;
     double_squeeze=false;
     wall_squeeze=false;
-   hallway_two_way=false;
-   maze=false;
+    hallway_two_way=false;
+    maze=false;
     choreography_rut29=false;
     
 
-   mass = AGENT_MASS;
+    mass = AGENT_MASS;
     Curve curve;
 }
 
@@ -261,10 +261,13 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
         assert(_forward.length()!=0.0f);
         assert(_goalQueue.size() != 0);
         assert(_radius != 0.0f);
+        std::cout << "you should not here"<<std::endl;
 
         
     }
     else{
+        
+        std::cout << "you should here"<<std::endl;
 
 	_enabled = true;
 
@@ -360,70 +363,67 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
 {
     float A_agent = _SocialForcesParams.sf_agent_a;
     float B_agent = _SocialForcesParams.sf_agent_b;
-
+    
     float A_wall = _SocialForcesParams.sf_wall_a;
     float B_wall = _SocialForcesParams.sf_wall_b;
-
+    
     float rad = _SocialForcesParams.sf_query_radius;
-
+    
     Vector force(0, 0, 0);
-
+    
     std::set<SteerLib::SpatialDatabaseItemPtr> neighbors;
     gEngine->getSpatialDatabase()->getItemsInRange(neighbors,
-        _position.x - (_radius + rad), _position.x + (_radius + rad),
-        _position.z - (_radius + rad), _position.z + (_radius + rad),
-        dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
-
+                                                   _position.x - (_radius + rad), _position.x + (_radius + rad),
+                                                   _position.z - (_radius + rad), _position.z + (_radius + rad),
+                                                   dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
+    
     for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
         Vector away;
         float r;
         float d;
-
+        
         //compute prameters.
+        
         if ((*neighbor)->isAgent()) { //agent.
             SteerLib::AgentInterface* agent = dynamic_cast<SteerLib::AgentInterface*>(*neighbor);
             away = normalize(_position - agent->position());//nij
             r = _radius + agent->radius(); //ri+rj
             d = (_position - agent->position()).length();//ok.
             force += A_agent * exp((r - d) / B_agent) * away;
-
-            if (agent->radius() == 1)
-                force *= 3;
+            
         } else {//obstacle.
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
             Vector wall_normal = calcWallNormal(obs); //niw
             std::pair<Point, Point> line = calcWallPointsFromNormal(obs, wall_normal);
             //Point min_dist = minimum_distance(line.first, line.second, _position).second; //diw
             float min_dist = minimum_distance(line.first, line.second, _position).first; //length. dij
-
+            
             // away = normalize(_position - min_dist);
             r = _radius;//r
             d = min_dist;//dij
             force += A_wall* exp((r - d) / B_wall) * wall_normal;
         }
         //each time rd compute for agent and obstacle and then adding to force.
-
+        
         //   force += A * exp((r - d) / B) * away;
     }
-
+    
     return force*dt;
-}
+}//
 
 Vector SocialForcesAgent::calcGoalForce(Vector _goalDirection, float _dt)
 {
-    if (_radius == 1)
-        return 3 * mass * (PREFERED_SPEED * _goalDirection - velocity()) / _dt; //diana. for
-    else
-        return mass * (PREFERED_SPEED * _goalDirection - velocity()) / _dt; //diana. for
+    return AGENT_MASS * (PREFERED_SPEED * _goalDirection - velocity());// / _dt;
 }
+//
 
 Util::Vector SocialForcesAgent::calcRepulsionForce(float dt)
 {
 #ifdef _DEBUG_
-	std::cout << "wall repulsion; " << calcWallRepulsionForce(dt) << " agent repulsion " <<
-			(_SocialForcesParams.sf_agent_repulsion_importance * calcAgentRepulsionForce(dt)) << std::endl;
+    std::cout << "wall repulsion; " << calcWallRepulsionForce(dt) << " agent repulsion " <<
+    (_SocialForcesParams.sf_agent_repulsion_importance * calcAgentRepulsionForce(dt)) << std::endl;
 #endif
-	return calcWallRepulsionForce(dt) + (_SocialForcesParams.sf_agent_repulsion_importance * calcAgentRepulsionForce(dt));
+    return calcWallRepulsionForce(dt) + (_SocialForcesParams.sf_agent_repulsion_importance * calcAgentRepulsionForce(dt));
 }
 
 Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
@@ -438,43 +438,57 @@ Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
                                                    _position.x - (_radius + rad), _position.x + (_radius + rad),
                                                    _position.z - (_radius + rad), _position.z + (_radius + rad),
                                                    dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
-
+    
+    
     for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
+        
         if ((*neighbor)->isAgent()) { //agent friction
+            
             SteerLib::AgentInterface* agent = dynamic_cast<SteerLib::AgentInterface*>(*neighbor);
             Vector away = normalize(_position - agent->position());
-
+            
             tangential_agent_away.x=-away.z;
             tangential_agent_away.z=away.x;
-
+            
             float tangential_velocity_difference = dot(agent->velocity()-velocity(),tangential_agent_away); //vj-vi //vji
             float r = _radius + agent->radius(); //rij
             float d = (_position - agent->position()).length(); //dij
             float dist = r-d;//penetration.
-
-            if (dist > 1e-6)
-                force += k * dist * tangential_velocity_difference * tangential_agent_away;
+            
+            if(dist>1e-6)
+            {
+                force+=k*dist*tangential_velocity_difference*tangential_agent_away;
+            }
             else
                 force += Vector (0,0,0);
-        } else{ //wall friction.
+            
+            
+        }
+        else{ //wall friction.
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
             Vector away = calcWallNormal(obs);
             // away = calcWallNormal(obs);
             tangential_wall_away.x=-away.z;
             tangential_wall_away.z=away.x;
-
+            
             std::pair<Point, Point> line = calcWallPointsFromNormal(obs, away);
             float min_dist = minimum_distance(line.first, line.second, _position).first;
             float dist=radius()-min_dist;//r-diw
-
+            
             if (dist>1e-6)
-                force += k * dist * dot(velocity(), tangential_wall_away) * tangential_wall_away;
-            else
+            {
+                
+                force+=k*dist*dot(velocity(),tangential_wall_away)*tangential_wall_away;
+            }
+            else//
                 force += Vector (0,0,0);
+            
+            
         }
     }
-
+    
     return force*dt;
+    
 }
 
 
@@ -482,8 +496,9 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
 {
     float k = _SocialForcesParams.sf_agent_body_force;
     float rad = _SocialForcesParams.sf_query_radius;
+    
     Vector force(0, 0, 0);
-
+    
     std::set<SteerLib::SpatialDatabaseItemPtr> neighbors;
     gEngine->getSpatialDatabase()->getItemsInRange(neighbors,
                                                    _position.x - (_radius + rad), _position.x + (_radius + rad),
@@ -495,32 +510,41 @@ Util::Vector SocialForcesAgent::calcAgentRepulsionForce(float dt)
      SteerLib::AgentInterface* agent = dynamic_cast<SteerLib::AgentInterface*>(*neighbor);
      Vector away = normalize(_position - agent->position());
      float dist = agent->computePenetration(_position, _radius);
-
+     
      force += k * dist * away;
      }
      }*/
-
+    
     // r = _radius + agent->radius(); //ri+rj
     //d = (_position - agent->position()).length();//ok.
-
+    
     for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
+        
         if ((*neighbor)->isAgent()) {
             SteerLib::AgentInterface* agent = dynamic_cast<SteerLib::AgentInterface*>(*neighbor);
-
+            
             Vector away = normalize(_position - agent->position()); //nij
             float r = _radius + agent->radius(); //rij
             float d = (_position - agent->position()).length(); //dij
-            if ((id() != agent->id()) && (r-d) > 0.0000001f) //penetration Indicator function. not itself and penetration criterion..
+            if ((id()!=agent->id())&&(r-d)>0.0000001f) //penetration Indicator function. not itself and penetration criterion..
+            {
                 force += k * (r-d) * away;
+                
+            }
             else
+            {
                 force += Vector (0,0,0);
-
-            if (agent->radius() == 1)
-                force *= 3;
-        } else
+                
+            }
+            
+        }
+        else
+        {
             continue;
+        }
     }
-
+    
+    
     return force*dt;
 }
 
@@ -528,35 +552,37 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
 {
     float k = _SocialForcesParams.sf_agent_body_force;
     float rad = _SocialForcesParams.sf_query_radius;
-
+    
     Vector force(0, 0, 0);
-
+    
     std::set<SteerLib::SpatialDatabaseItemPtr> neighbors;
     gEngine->getSpatialDatabase()->getItemsInRange(neighbors,
-        _position.x - (_radius + rad), _position.x + (_radius + rad),
-        _position.z - (_radius + rad), _position.z + (_radius + rad),
-        dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
-
+                                                   _position.x - (_radius + rad), _position.x + (_radius + rad),
+                                                   _position.z - (_radius + rad), _position.z + (_radius + rad),
+                                                   dynamic_cast<SteerLib::SpatialDatabaseItemPtr>(this));
+    
     for (std::set<SteerLib::SpatialDatabaseItemPtr>::const_iterator neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); neighbor++) {
         if (!(*neighbor)->isAgent()) { //obstacle
             Vector away;
             float dist;
-
+            
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
-
+            
             away = calcWallNormal(obs);//niw
             std::pair<Point, Point> line = calcWallPointsFromNormal(obs, away);
             float min_dist = minimum_distance(line.first, line.second, _position).first;//diw
             dist=radius()-min_dist; //ri-diw
-
+            
             if (dist > 1e-7) {
                 force += k * dist * away;
             }
             else //indicator.s
                 force +=Vector(0,0,0);
+            
+            
         }//obstacle;
     }
-
+    
     return force*dt;
 }
 
@@ -757,6 +783,8 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
     
     if (choreography_rut29&&_radius==1)
     {
+        std::cout << "you should not here"<<std::endl;
+
         //For this function, we assume that all goals are of type GOAL_TYPE_SEEK_STATIC_TARGET.
         //The error check for this was performed in reset().
       //  Util::AutomaticFunctionProfiler profileThisFunction( &CurveAIGlobals::gPhaseProfilers->aiProfiler );
@@ -780,118 +808,131 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
 
 else
 {
-	Util::AutomaticFunctionProfiler profileThisFunction( &SocialForcesGlobals::gPhaseProfilers->aiProfiler );
-	if (!enabled())
-		return;
+    std::cout << "you should here"<<std::endl;
 
-	Util::AxisAlignedBox oldBounds(_position.x - _radius, _position.x + _radius, 0.0f, 0.0f, _position.z - _radius, _position.z + _radius);
-
-	SteerLib::AgentGoalInfo goalInfo = _goalQueue.front();
-	Util::Vector goalDirection;
-	if ( ! _midTermPath.empty() && (!this->hasLineOfSightTo(goalInfo.targetLocation)) )
-	{
-		if (reachedCurrentWaypoint())
-		{
-			this->updateMidTermPath();
-		}
-
-		this->updateLocalTarget();
-
-		goalDirection = normalize(_currentLocalTarget - position());
-	}
-	else
-	{
-		goalDirection = normalize(goalInfo.targetLocation - position());
-	}
-
-    // Goal Force
+    
+    // std::cout << "_SocialForcesParams.rvo_max_speed " << _SocialForcesParams._SocialForcesParams.rvo_max_speed << std::endl;
+    Util::AutomaticFunctionProfiler profileThisFunction( &SocialForcesGlobals::gPhaseProfilers->aiProfiler );
+    if (!enabled())
+    {
+        return;
+    }
+    
+    Util::AxisAlignedBox oldBounds(_position.x - _radius, _position.x + _radius, 0.0f, 0.0f, _position.z - _radius, _position.z + _radius);
+    
+    SteerLib::AgentGoalInfo goalInfo = _goalQueue.front();
+    Util::Vector goalDirection;
+    if ( ! _midTermPath.empty() && (!this->hasLineOfSightTo(goalInfo.targetLocation)) )
+    {
+        if (reachedCurrentWaypoint())
+        {
+            this->updateMidTermPath();
+        }
+        
+        this->updateLocalTarget();
+        
+        goalDirection = normalize(_currentLocalTarget - position());
+        
+    }
+    else
+    {
+        goalDirection = normalize(goalInfo.targetLocation - position());
+    }
+    
+    /*
+     *  Goal Force
+     */
     Util::Vector prefForce = calcGoalForce( goalDirection, dt );
-
-    // Repulsion Force
-	Util::Vector repulsionForce = calcRepulsionForce(dt);
+    
+    /*
+     *  Repulsion Force
+     */
+    Util::Vector repulsionForce = calcRepulsionForce(dt);
     Util::Vector frictionForce = calcFrictionForce(dt);
-	if ( repulsionForce.x != repulsionForce.x)
-	{
-		std::cout << "Found some nan" << std::endl;
-		// repulsionForce = velocity() * 0;
-	}
-
-    // Proximity Force
-	Util::Vector proximityForce = calcProximityForce(dt);
-
-// #define _DEBUG_ 1
+    if ( repulsionForce.x != repulsionForce.x)
+    {
+        std::cout << "Found some nan" << std::endl;
+        // repulsionForce = velocity() * 0;
+    }
+    
+    /*
+     *  Proximity Force
+     */
+    Util::Vector proximityForce = calcProximityForce(dt);
+    
+    // #define _DEBUG_ 1
 #ifdef _DEBUG_
-	std::cout << "agent" << id() << " repulsion force " << repulsionForce << std::endl;
-	std::cout << "agent" << id() << " proximity force " << proximityForce << std::endl;
-	std::cout << "agent" << id() << " pref force " << prefForce << std::endl;
+    std::cout << "agent" << id() << " repulsion force " << repulsionForce << std::endl;
+    std::cout << "agent" << id() << " proximity force " << proximityForce << std::endl;
+    std::cout << "agent" << id() << " pref force " << prefForce << std::endl;
 #endif
-	// _velocity = _newVelocity;
-	int alpha=1;
-	if ( repulsionForce.length() > 0.0)
-	{
-		alpha=0;
-	}
-
-	Util::Vector acceleration = (prefForce + repulsionForce + proximityForce+frictionForce) / mass;
-
-	_velocity = velocity() + acceleration * dt;
-	_velocity = clamp(velocity(), _SocialForcesParams.sf_max_speed);
-	_velocity.y=0.0f;
+    // _velocity = _newVelocity;
+    int alpha=1;
+    if ( repulsionForce.length() > 0.0)
+    {
+        alpha=0;
+    }
+    
+    Util::Vector acceleration = (prefForce + repulsionForce + proximityForce+frictionForce) / AGENT_MASS;
+    _velocity = velocity() + acceleration * dt;
+    _velocity = clamp(velocity(), _SocialForcesParams.sf_max_speed);
+    _velocity.y=0.0f;
 #ifdef _DEBUG_
-	std::cout << "agent" << id() << " speed is " << velocity().length() << std::endl;
+    std::cout << "agent" << id() << " speed is " << velocity().length() << std::endl;
 #endif
-	_position = position() + (velocity() * dt);
-	// A grid database update should always be done right after the new position of the agent is calculated
-	/*
-	 * Or when the agent is removed for example its true location will not reflect its location in the grid database.
-	 * Not only that but this error will appear random depending on how well the agent lines up with the grid database
-	 * boundaries when removed.
-	 */
-	// std::cout << "Updating agent" << this->id() << " at " << this->position() << std::endl;
-	Util::AxisAlignedBox newBounds(_position.x - _radius, _position.x + _radius, 0.0f, 0.0f, _position.z - _radius, _position.z + _radius);
-	gSpatialDatabase->updateObject( this, oldBounds, newBounds);
-
-/*
-	if ( ( !_waypoints.empty() ) && (_waypoints.front() - position()).length() < radius()*WAYPOINT_THRESHOLD_MULTIPLIER)
-	{
-		_waypoints.erase(_waypoints.begin());
-	}
-	*/
-	/*
-	 * Now do the conversion from SocialForcesAgent into the SteerSuite coordinates
-	 */
-	// _velocity.y = 0.0f;
-
-	if ((goalInfo.targetLocation - position()).length() < radius()*GOAL_THRESHOLD_MULTIPLIER ||
-			(goalInfo.goalType == GOAL_TYPE_AXIS_ALIGNED_BOX_GOAL &&
-					Util::boxOverlapsCircle2D(goalInfo.targetRegion.xmin, goalInfo.targetRegion.xmax,
-							goalInfo.targetRegion.zmin, goalInfo.targetRegion.zmax, this->position(), this->radius())))
-	{
-		_goalQueue.pop();
-		// std::cout << "Made it to a goal" << std::endl;
-		if (_goalQueue.size() != 0)
-		{
-			// in this case, there are still more goals, so start steering to the next goal.
-			goalDirection = _goalQueue.front().targetLocation - _position;
-			_prefVelocity = Util::Vector(goalDirection.x, 0.0f, goalDirection.z);
-		}
-		else
-		{
-			// in this case, there are no more goals, so disable the agent and remove it from the spatial database.
-			disable();
-			return;
-		}
-	}
-
-	// Hear the 2D solution from RVO is converted into the 3D used by SteerSuite
-	// _velocity = Vector(velocity().x, 0.0f, velocity().z);
-	if ( velocity().lengthSquared() > 0.0 )
-	{
-		// Only assign forward direction if agent is moving
-		// Otherwise keep last forward
-		_forward = normalize(_velocity);
-	}
-	// _position = _position + (_velocity * dt);
+    _position = position() + (velocity() * dt);
+    // A grid database update should always be done right after the new position of the agent is calculated
+    /*
+     * Or when the agent is removed for example its true location will not reflect its location in the grid database.
+     * Not only that but this error will appear random depending on how well the agent lines up with the grid database
+     * boundaries when removed.
+     */
+    // std::cout << "Updating agent" << this->id() << " at " << this->position() << std::endl;
+    Util::AxisAlignedBox newBounds(_position.x - _radius, _position.x + _radius, 0.0f, 0.0f, _position.z - _radius, _position.z + _radius);
+    gSpatialDatabase->updateObject( this, oldBounds, newBounds);
+    
+    /*
+     if ( ( !_waypoints.empty() ) && (_waypoints.front() - position()).length() < radius()*WAYPOINT_THRESHOLD_MULTIPLIER)
+     {
+     _waypoints.erase(_waypoints.begin());
+     }
+     */
+    /*
+     * Now do the conversion from SocialForcesAgent into the SteerSuite coordinates
+     */
+    // _velocity.y = 0.0f;
+    
+    if ((goalInfo.targetLocation - position()).length() < radius()*GOAL_THRESHOLD_MULTIPLIER ||
+        (goalInfo.goalType == GOAL_TYPE_AXIS_ALIGNED_BOX_GOAL &&
+         Util::boxOverlapsCircle2D(goalInfo.targetRegion.xmin, goalInfo.targetRegion.xmax,
+                                   goalInfo.targetRegion.zmin, goalInfo.targetRegion.zmax, this->position(), this->radius())))
+    {
+        _goalQueue.pop();
+        // std::cout << "Made it to a goal" << std::endl;
+        if (_goalQueue.size() != 0)
+        {
+            // in this case, there are still more goals, so start steering to the next goal.
+            goalDirection = _goalQueue.front().targetLocation - _position;
+            _prefVelocity = Util::Vector(goalDirection.x, 0.0f, goalDirection.z);
+        }
+        else
+        {
+            // in this case, there are no more goals, so disable the agent and remove it from the spatial database.
+            disable();
+            return;
+        }
+    }
+    
+    // Hear the 2D solution from RVO is converted into the 3D used by SteerSuite
+    // _velocity = Vector(velocity().x, 0.0f, velocity().z);
+    if ( velocity().lengthSquared() > 0.0 )
+    {
+        // Only assign forward direction if agent is moving
+        // Otherwise keep last forward
+        _forward = normalize(_velocity);
+    }
+    // _position = _position + (_velocity * dt);
+    
 }
 }
 
