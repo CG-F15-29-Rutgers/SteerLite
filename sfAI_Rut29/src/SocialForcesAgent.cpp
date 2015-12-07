@@ -297,7 +297,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     }
     else{
         
-        std::cout << "you should here"<<std::endl;
+        // std::cout << "you should here"<<std::endl;
 
 	_enabled = true;
 
@@ -840,7 +840,7 @@ void SocialForcesAgent::updateAI(float timeStamp, float dt, unsigned int frameNu
 
 else
 {
-    std::cout << "you should here"<<std::endl;
+    // std::cout << "you should here"<<std::endl;
 
     
     // std::cout << "_SocialForcesParams.rvo_max_speed " << _SocialForcesParams._SocialForcesParams.rvo_max_speed << std::endl;
