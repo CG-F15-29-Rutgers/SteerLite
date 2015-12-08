@@ -164,7 +164,7 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         crowd_crossing=true;
         _SocialForcesParams.sf_body_force = 3000;
-         _SocialForcesParams.sf_wall_b = 1.4; //  inverse proximity force importance
+         _SocialForcesParams.sf_wall_b = 1.6; //  inverse proximity force importance
          _SocialForcesParams.sf_wall_a = 60; //  proximity force importance
         //_SocialForcesParams.sf_agent_b = 1; //  inverse proximity force importance
         //_SocialForcesParams.sf_agent_a = 40; //  proximity force importance
@@ -230,6 +230,8 @@ void SocialForcesAgent::reset(const SteerLib::AgentInitialConditions & initialCo
     {
         maze=true;
         obstacleClearance = 2;
+        _SocialForcesParams.sf_wall_b = 0.9;
+        _SocialForcesParams.sf_wall_a = 50;
        // std::cout << "Are you comming here?" << std::endl;
 
     }
@@ -420,7 +422,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
             r = _radius + agent->radius(); //ri+rj
             d = (_position - agent->position()).length();//ok.
             force += A_agent * exp((r - d) / B_agent) * away;
-            if((choreography_rut29 && agent->radius()==1)||(wall_squeeze&&agent->position().x<0)||(doorway_two_way&&agent->position().x<0))
+            if((choreography_rut29 && agent->radius()==1)||(wall_squeeze&&agent->position().x<0)||(doorway_two_way&&agent->position().x<0) || (crowd_crossing && agent->radius()==1))
                 force*=3;
             
         } else {//obstacle.
@@ -1021,7 +1023,7 @@ bool SocialForcesAgent::runASTARplanning() //Diana added.
     std::vector<Util::Point> agentPath;
     Util::Point pos = position(); //start_position.
     int weight =1;
-    if (bottleneck_squeeze)
+    if (bottleneck_squeeze || maze)
         weight = 10;
 
     /*
