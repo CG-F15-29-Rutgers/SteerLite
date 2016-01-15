@@ -400,6 +400,7 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
     float B_wall = _SocialForcesParams.sf_wall_b;
     
     float rad = _SocialForcesParams.sf_query_radius;
+    int index;
     
     Vector force(0, 0, 0);
     
@@ -427,8 +428,8 @@ Util::Vector SocialForcesAgent::calcProximityForce(float dt)
             
         } else {//obstacle.
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
-            Vector wall_normal = calcWallNormal(obs); //niw
-            std::pair<Point, Point> line = calcWallPointsFromNormal(obs, wall_normal);
+            Vector wall_normal = calcWallNormal(obs,index); //niw
+            std::pair<Point, Point> line = calcWallPointsFromNormal(obs, wall_normal,index);
             //Point min_dist = minimum_distance(line.first, line.second, _position).second; //diw
             float min_dist = minimum_distance(line.first, line.second, _position).first; //length. dij
             
@@ -464,6 +465,7 @@ Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
 {
     float k = _SocialForcesParams.sf_sliding_friction_force;
     float rad = _SocialForcesParams.sf_query_radius;
+    int index;
     Vector force(0,0,0);
     Vector tangential_agent_away(0,0,0);
     Vector tangential_wall_away(0,0,0);
@@ -500,12 +502,12 @@ Util::Vector SocialForcesAgent::calcFrictionForce(float dt)
         }
         else{ //wall friction.
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
-            Vector away = calcWallNormal(obs);
+            Vector away = calcWallNormal(obs,index);
             // away = calcWallNormal(obs);
             tangential_wall_away.x=-away.z;
             tangential_wall_away.z=away.x;
             
-            std::pair<Point, Point> line = calcWallPointsFromNormal(obs, away);
+            std::pair<Point, Point> line = calcWallPointsFromNormal(obs, away,index);
             float min_dist = minimum_distance(line.first, line.second, _position).first;
             float dist=radius()-min_dist;//r-diw
             
@@ -586,6 +588,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
 {
     float k = _SocialForcesParams.sf_agent_body_force;
     float rad = _SocialForcesParams.sf_query_radius;
+    int index;
     
     Vector force(0, 0, 0);
     
@@ -602,8 +605,8 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
             
             SteerLib::ObstacleInterface* obs = dynamic_cast<SteerLib::ObstacleInterface*>(*neighbor);
             
-            away = calcWallNormal(obs);//niw
-            std::pair<Point, Point> line = calcWallPointsFromNormal(obs, away);
+            away = calcWallNormal(obs,index);//niw
+            std::pair<Point, Point> line = calcWallPointsFromNormal(obs, away, index);
             float min_dist = minimum_distance(line.first, line.second, _position).first;//diw
             dist=radius()-min_dist; //ri-diw
             
@@ -620,7 +623,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
     return force*dt;
 }
 
-std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal)
+std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal, int min_index)
 {
 	Util::AxisAlignedBox box = obs->getBounds();
 	if ( normal.z == 1)
@@ -663,8 +666,9 @@ std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(
  */
 
 
-Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
+Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs, int& min_index)
 {
+#if 1
 	Util::AxisAlignedBox box = obs->getBounds();
     Util::Vector temp(0,0,0);
 	if ( position().x > box.xmax )
@@ -774,6 +778,53 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs)
 			return calcObsNormal( obs );
 		}
 	}
+
+#else//Diana ADD. for polygon.
+    
+    std::vector<Util::Vector> vects;
+    obs->returnVertices( vects ); // all points of one of the obstacles.
+    
+    Util::Vector agent_position;
+    agent_position.x=position().x;
+    agent_position.y=position().y;
+    agent_position.z=position().z;
+    
+    int vects_size = vects.size(); //number of vertices. //until here okay.
+    std::cout << "vector size " << vects_size << std::endl;
+    
+    //initial comparison.
+    Util::Vector AX =agent_position-vects[0];
+    Util::Vector BX =agent_position-vects[1];//next
+    min_index = 0;
+    float min_length = AX.length()+BX.length();
+    
+    //find min index
+    
+    for ( int i = 0; i < vects_size;++i) //effective vertices collection
+    {
+        
+         AX =agent_position-vects[(i)%vects_size];
+         BX =agent_position-vects[(i+1)%vects_size];//next
+        
+        if (AX.length()+BX.length()<min_length)
+        {
+            min_index = i; //update
+            min_length =AX.length()+BX.length();
+        }
+        
+        
+    }
+    
+    
+    Util::Vector AB =vects[(min_index+1)%vects_size]-vects[(min_index)%vects_size]; //B-A
+    Util::Vector AC =vects[(min_index+2)%vects_size]-vects[(min_index)%vects_size]; //C-A
+    Util::Vector normal_direction = normalize(-cross(cross(AB,AC),AB)); //direction of outside.
+    
+    
+    
+    return normal_direction;
+    
+#endif
 }
 
 /**

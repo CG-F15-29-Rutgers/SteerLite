@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXGroup section */
-		F28C6A691BE599FE00C43F09 = {
+		F2C231491C49B5620076E92F = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -16,19 +16,19 @@
 /* End PBXGroup section */
 
 /* Begin PBXProject section */
-		F28C6A6A1BE599FE00C43F09 /* Project object */ = {
+		F2C2314A1C49B5620076E92F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0710;
 			};
-			buildConfigurationList = F28C6A6D1BE599FE00C43F09 /* Build configuration list for PBXProject "Social force" */;
+			buildConfigurationList = F2C2314D1C49B5620076E92F /* Build configuration list for PBXProject "Social force" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = F28C6A691BE599FE00C43F09;
+			mainGroup = F2C231491C49B5620076E92F;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -37,13 +37,13 @@
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
-		F28C6A6E1BE599FE00C43F09 /* Debug */ = {
+		F2C2314E1C49B5620076E92F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
 			name = Debug;
 		};
-		F28C6A6F1BE599FE00C43F09 /* Release */ = {
+		F2C2314F1C49B5620076E92F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
@@ -52,16 +52,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F28C6A6D1BE599FE00C43F09 /* Build configuration list for PBXProject "Social force" */ = {
+		F2C2314D1C49B5620076E92F /* Build configuration list for PBXProject "Social force" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F28C6A6E1BE599FE00C43F09 /* Debug */,
-				F28C6A6F1BE599FE00C43F09 /* Release */,
+				F2C2314E1C49B5620076E92F /* Debug */,
+				F2C2314F1C49B5620076E92F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = F28C6A6A1BE599FE00C43F09 /* Project object */;
+	rootObject = F2C2314A1C49B5620076E92F /* Project object */;
 }

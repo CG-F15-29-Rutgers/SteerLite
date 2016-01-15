@@ -136,8 +136,8 @@ class SocialForcesAgent : public SteerLib::AgentInterface
         Util::Vector calcWallRepulsionForce(float dt);
     Util::Vector calcFrictionForce(float dt);
 
-        Util::Vector calcWallNormal(SteerLib::ObstacleInterface* obs);
-        std::pair<Util::Point, Util::Point> calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal);
+        Util::Vector calcWallNormal(SteerLib::ObstacleInterface* obs, int& min_index);
+        std::pair<Util::Point, Util::Point> calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal, int min_index);
         Util::Vector calcObsNormal(SteerLib::ObstacleInterface* obs);
 
         // For midterm planning stores the plan to the current goal
