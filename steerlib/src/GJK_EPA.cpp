@@ -148,20 +148,13 @@ void SteerLib::GJK_EPA::EPA(float& penetration_depth, Util::Vector& penetration_
 
 Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>& A,  const std::vector<Util::Vector>& B,const std::vector<Util::Vector>& simplex, int& index, float& distance)
 {
-    //Util::Vector test(0,0,0);
-
-    // assert(simplex.size() > 2); we have to handel line simplex.
     std::vector<Util::Vector> edge;
-    //Util::vector normal_origin_edge1;
-    // Util::vector normal_origin_edge2;
     Util::Vector support_edge1;
     Util::Vector support_edge2;
     int simplex_size=simplex.size();
 
     for (size_t i =0; i< simplex_size;++i)
-    {
         edge.push_back(simplex[(i+1)%simplex_size]-simplex[(i)%simplex_size]); // 01 12 23 30 , when 4 vertexes i->i+1
-    }
 
     // line case just AB BA.
 
@@ -180,6 +173,7 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
             support_edge2 = support(A,normal_origin_edge2)-support(B,-normal_origin_edge2);
 
             if (dot(support_edge1, normal_origin_edge1) > 0)
+            {
                 if (dot(support_edge2, normal_origin_edge2) > 0) //inner.
                 {
                     for (size_t j = 0; j < simplex_size; ++j)
@@ -192,42 +186,32 @@ Util::Vector SteerLib::GJK_EPA::findClosestEdge(const std::vector<Util::Vector>&
                     }
                     distance =0; // no same vertex. this can be the next direction.
                     return -normal_origin_edge1;
-
                 }
                 else //outer.
                 {
                     distance = 0;
                     return -normal_origin_edge1;
                 }
-
-
-                else //normal_origin_edge2>=0
-                {
-                    distance =0;
-                    return -normal_origin_edge2;
-                }
-
-
-
+            }
+            else //normal_origin_edge2>=0
+            {
+                distance =0;
+                return -normal_origin_edge2;
+            }
         }
         distances.push_back(dot(-simplex[i], unit(normal_to_edge[i]))); // distance seems to be negative....-> so corrected.
     }
+
     index = 0;
     int distance_size = distances.size();
+
     for (size_t i = 0; i < distance_size; ++i)
-    {
         if (distances[index] > distances[i])
-        {
-
             index = i;
-        }
-    }
-
 
     distance = distances[index]; // update min distance to edge.
     return normal_to_edge[index];
-
-   }
+}
 
 /**
  * @brief Detect collisions using the GJK and EPA algorithms. Note
