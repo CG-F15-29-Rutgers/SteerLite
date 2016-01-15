@@ -15,14 +15,30 @@
 PolygonObstacle::PolygonObstacle(std::vector<Util::Point> points, float traversalCost)
 {
 	// TODO Auto-generated constructor stub
-	_traversalCost = traversalCost;
-	_points = points;
-
+    
+   
+    _traversalCost = traversalCost;     _points = points;
+    
+    _bounds.xmin = _points[0].x;
+    _bounds.zmin = _points[0].z;
+    _bounds.xmax = _points[0].x;
+    _bounds.zmax = _points[0].z;
+    
+    
     for ( size_t i = 0 ; i < _points.size() ; ++i )
     {
         _vectors.push_back( Util::Vector( _points[i].x, _points[i].y, _points[i].z ) );
+        if(_points[i].x<_bounds.xmin)
+            _bounds.xmin = _points[i].x;
+        if(_points[i].z<_bounds.zmin)
+            _bounds.zmin = _points[i].z;
+        if(_points[i].x>_bounds.xmax)
+            _bounds.xmax = _points[i].x;
+        if(_points[i].z>_bounds.zmax)
+            _bounds.zmax = _points[i].z;
+        
     }
-
+    /*
 	_centerPosition = Util::Point(0,0,0);
 	_radius = 0.0;
 	float ymin = 0.0;
@@ -34,7 +50,7 @@ PolygonObstacle::PolygonObstacle(std::vector<Util::Point> points, float traversa
 	_bounds.zmin = _centerPosition.z - _radius;
 	_bounds.zmax = _centerPosition.z + _radius;
 
-	// TODO make parameter
+	// TODO make parameter*/ //Diana Modify.
 	isConvex_ = true;
 
 }
