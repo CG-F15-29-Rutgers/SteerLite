@@ -812,25 +812,26 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs,
     std::cout << "vector size " << vects_size << std::endl;
     
     //initial comparison.
-    Util::Vector AX =agent_position-vects[0];
-    Util::Vector BX =agent_position-vects[1];//next
+    std::pair<Point, Point> line;
+    float min_dist;
     min_index = 0;
-    float min_length = AX.length()+BX.length();
+    line = std::make_pair(Util::Point(vects[0].x,0,vects[0].z),Util::Point(vects[1].x,0,vects[1].z));
+    min_dist = minimum_distance(line.first, line.second, _position).first;
     
-    //find min index
+
+        //find min index
     
     for ( int i = 0; i < vects_size;++i) //effective vertices collection
+    
     {
-        
-         AX =agent_position-vects[(i)%vects_size];
-         BX =agent_position-vects[(i+1)%vects_size];//next
-        
-        if (AX.length()+BX.length()<min_length)
+        float min_length;
+        std::pair<Point, Point> line_1 = std::make_pair(Util::Point(vects[i%vects_size].x,0,vects[i%vects_size].z),Util::Point(vects[(i+1)%vects_size].x,0,vects[(i+1)%vects_size].z));
+        min_length = minimum_distance(line_1.first, line_1.second, _position).first;
+        if (min_dist>min_length)//if you find smaller value then update.
         {
-            min_index = i; //update
-            min_length =AX.length()+BX.length();
+            min_dist = min_length;
+            min_index = i;
         }
-        
         
     }
     
