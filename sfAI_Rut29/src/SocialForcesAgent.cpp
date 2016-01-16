@@ -625,6 +625,7 @@ Util::Vector SocialForcesAgent::calcWallRepulsionForce(float dt)
 
 std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(SteerLib::ObstacleInterface* obs, Util::Vector normal, int min_index)
 {
+#if 0 //Diana Kim
 	Util::AxisAlignedBox box = obs->getBounds();
 	if ( normal.z == 1)
 	{
@@ -643,6 +644,24 @@ std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(
 	{
 		return std::make_pair(Util::Point(box.xmin,0,box.zmin), Util::Point(box.xmin,0,box.zmax));
 	}
+#else
+    
+    std::vector<Util::Vector> vects;
+    obs->returnVertices( vects ); // all points of one of the obstacles.
+    int vects_size = vects.size(); //number of vertices. //until here okay.
+    std::cout << "vector size " << vects_size << std::endl;
+    
+    //return vertice.
+    std::cout << "vertice points " << vects[min_index%vects_size].x<< std::endl;
+    std::cout << "vertice points " << vects[min_index%vects_size].z << std::endl;
+    std::cout << "vertice size " << vects[(min_index+1)%vects_size].x<< std::endl;
+    std::cout << "vertice size " <<vects[(min_index+1)%vects_size].z<< std::endl;
+
+    
+    return std::make_pair(Util::Point(vects[min_index%vects_size].x,0,vects[min_index%vects_size].z), Util::Point(vects[(min_index+1)%vects_size].x,0,vects[(min_index+1)%vects_size].z));
+    
+
+#endif
 }
 
 /**
@@ -668,7 +687,7 @@ std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(
 
 Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs, int& min_index)
 {
-#if 1
+#if 0
 	Util::AxisAlignedBox box = obs->getBounds();
     Util::Vector temp(0,0,0);
 	if ( position().x > box.xmax )
