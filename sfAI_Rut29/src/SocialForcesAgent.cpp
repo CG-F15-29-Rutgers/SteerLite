@@ -645,11 +645,14 @@ std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(
 		return std::make_pair(Util::Point(box.xmin,0,box.zmin), Util::Point(box.xmin,0,box.zmax));
 	}
 #else
+
+    
     
     std::vector<Util::Vector> vects;
     obs->returnVertices( vects ); // all points of one of the obstacles.
     int vects_size = vects.size(); //number of vertices. //until here okay.
     std::cout << "vector size " << vects_size << std::endl;
+    if (vects_size>4){
     
     //return vertice.
     std::cout << "vertice points " << vects[min_index%vects_size].x<< std::endl;
@@ -659,7 +662,30 @@ std::pair<Util::Point, Util::Point> SocialForcesAgent::calcWallPointsFromNormal(
 
     
     return std::make_pair(Util::Point(vects[min_index%vects_size].x,0,vects[min_index%vects_size].z), Util::Point(vects[(min_index+1)%vects_size].x,0,vects[(min_index+1)%vects_size].z));
-    
+    }
+    else
+    {
+        Util::AxisAlignedBox box = obs->getBounds();
+        if ( normal.z == 1)
+        {
+            return std::make_pair(Util::Point(box.xmin,0,box.zmax), Util::Point(box.xmax,0,box.zmax));
+            // Ended here;
+        }
+        else if ( normal.z == -1 )
+        {
+            return std::make_pair(Util::Point(box.xmin,0,box.zmin), Util::Point(box.xmax,0,box.zmin));
+        }
+        else if ( normal.x == 1)
+        {
+            return std::make_pair(Util::Point(box.xmax,0,box.zmin), Util::Point(box.xmax,0,box.zmax));
+        }
+        else // normal.x == -1
+        {
+            return std::make_pair(Util::Point(box.xmin,0,box.zmin), Util::Point(box.xmin,0,box.zmax));
+        }
+
+        
+    }
 
 #endif
 }
@@ -810,7 +836,8 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs,
     
     int vects_size = vects.size(); //number of vertices. //until here okay.
     std::cout << "vector size " << vects_size << std::endl;
-    
+    if (vects_size >4)
+    {
     //initial comparison.
     std::pair<Point, Point> line;
     float min_dist;
@@ -843,6 +870,121 @@ Util::Vector SocialForcesAgent::calcWallNormal(SteerLib::ObstacleInterface* obs,
     
     
     return normal_direction;
+    }
+    else //rectangle
+    {
+        Util::AxisAlignedBox box = obs->getBounds();
+        Util::Vector temp(0,0,0);
+        if ( position().x > box.xmax )
+        {
+            if ( position().z > box.zmax)
+            {
+                /*
+                 if ( abs(position().z - box.zmax ) >
+                 abs( position().x - box.xmax) )
+                 {
+                 return Util::Vector(0, 0, 1);
+                 }
+                 else
+                 {
+                 return Util::Vector(1, 0, 0);
+                 }
+                 */
+                
+                //obj-wall corner.
+                
+                
+                temp=position()-Util::Point(box.xmax,0,box.zmax);
+                return temp;
+                
+            }
+            else if ( position().z < box.zmin )
+            {
+                /* corner handling.
+                 if ( abs(position().z - box.zmin ) >
+                 abs( position().x - box.xmax) )
+                 {
+                 return Util::Vector(0, 0, -1);
+                 }
+                 else
+                 {
+                 return Util::Vector(1, 0, 0);
+                 }
+                 */
+                
+                temp=position()-Util::Point(box.xmax,0,box.zmin);
+                return temp;
+                
+                
+            }
+            else
+            { // in between zmin and zmax
+                return Util::Vector(1, 0, 0);
+            }
+            
+        }
+        else if ( position().x < box.xmin )
+        {
+            if ( position().z > box.zmax )
+            {
+                /*
+                 if ( abs(position().z - box.zmax ) >
+                 abs( position().x - box.xmin) )
+                 {
+                 return Util::Vector(0, 0, 1);
+                 }
+                 else
+                 {
+                 return Util::Vector(-1, 0, 0);
+                 }
+                 */
+                
+                temp=position()-Util::Point(box.xmin,0,box.zmax);
+                return temp;
+                
+            }
+            else if ( position().z < box.zmin )
+            {
+                /*
+                 if ( abs(position().z - box.zmin ) >
+                 abs( position().x - box.xmin) )
+                 {
+                 return Util::Vector(0, 0, -1);
+                 }
+                 else
+                 {
+                 return Util::Vector(-1, 0, 0);
+                 }
+                 */
+                
+                
+                temp=position()-Util::Point(box.xmin,0,box.zmin);
+                return temp;
+                
+            }
+            else
+            { // in between zmin and zmax
+                return Util::Vector(-1, 0, 0);
+            }
+        }
+        else // between xmin and xmax
+        {
+            if ( position().z > box.zmax )
+            {
+                return Util::Vector(0, 0, 1);
+            }
+            else if ( position().z < box.zmin)
+            {
+                return Util::Vector(0, 0, -1);
+            }
+            else
+            { // What do we do if the agent is inside the wall?? Lazy Normal
+                return calcObsNormal( obs );
+            }
+        }
+
+        
+    }
     
 #endif
 }
